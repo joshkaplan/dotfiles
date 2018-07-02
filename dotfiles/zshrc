@@ -1,0 +1,113 @@
+# ZSH Config
+# Josh Kaplan
+
+# Path to oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+# Set name of the theme to load (look in ~/.oh-my-zsh/themes/)
+ZSH_THEME="agnoster"
+DEFAULT_USER="josh"
+
+# Auto Correct
+# ENABLE_CORRECTION="true"
+eval "$(thefuck --alias)"
+
+# Separate Histories
+unsetopt inc_append_history
+unsetopt share_history
+
+# Online Help
+# unalias run-help
+autoload run-help
+HELPDIR=/usr/local/share/zsh/help
+
+# Auto Completion
+zmodload zsh/complist
+bindkey -M menuselect ' ' accept-and-infer-next-history
+bindkey -M menuselect '^?' undo
+
+# Plugins
+plugins=(git sublime osx)
+
+# Shell integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Aliased Places
+alias dev='~/Dev'
+alias ohmyzsh='~/.oh-my-zsh'
+
+# Aliased Commands
+alias zshconfig='vim ~/.zshrc && source ~/.zshrc'
+alias del='rmtrash'
+alias dj="python manage.py"
+alias mp="open -a /Applications/Mailplane\ 3.app"
+function ls () { /bin/ls $* | grep -v 'Icon\?\|.DS_Store' }
+alias reload='exec -l /usr/local/bin/zsh'
+alias notif='terminal-notifier -message'
+file-to-clipboard() {
+    osascript \
+        -e 'on run args' \
+        -e 'set the clipboard to POSIX file (first item of args)' \
+        -e end \
+        "$@"
+}
+
+# rbenv (ruby)
+eval "$(rbenv init -)"
+
+# Github
+eval "$(hub alias -s)"
+
+# Postgres
+export PGDATA="/usr/local/var/postgres"
+
+# SSH
+export SSH_KEY_PATH="~/.ssh/dsa_id"
+
+# Virtualenv
+# export WORKON_HOME=~/Envs
+# export VIRTUALENVWRAPPER_PYTHON='/usr/local/bin/python' # use brewed python
+# source /usr/local/bin/virtualenvwrapper.sh
+
+# PATH
+# export PATH=$PATH:/usr/local/mysql/bin # MySQL
+# export PATH="/usr/local/heroku/bin:$PATH" # Heroku
+# export PATH=/opt/local/bin:/opt/local/sbin:$PATH # Macports (consider removing)
+export PATH="/usr/local/bin:/usr/local/sbin:~/bin:$PATH" # Homebrew
+
+# Editors
+export EDITOR=vim
+export VISUAL=vim
+
+# Source Oh My ZSH!
+source $ZSH/oh-my-zsh.sh
+
+# Vim Keybindings
+bindkey -v
+
+# Git Commands (Some override ZSH Plugin)
+alias gla="gl && git submodule update --init --recursive"
+alias gl='git pull --rebase'
+alias glgga='git log --graph --decorate --all --max-count=100'
+alias glo='git log --oneline --decorate --color --max-count=100'
+alias glog='git log --oneline --decorate --color --graph --max-count=100'
+alias gpnp="gl && git push"
+alias glanp="gla && git push"
+alias gsla="git stash && gla && git stash pop"
+alias gd1="git diff HEAD~1"
+alias gd2="git diff HEAD~2"
+alias grp="git rev-parse"
+ghc() {
+	git browse -- commit/$*
+}
+alias ghcr="ghc \`grp HEAD\`"
+alias gh="git browse"
+alias gph="git push && ghcr"
+alias glanph="glanp && ghcr"
+alias gsu="git submodule update --init --recursive"
+alias gsth="git stash"
+
+# Local overrides
+if [ -e ~/.local.zsh ]; then
+    source ~/.local.zsh
+fi

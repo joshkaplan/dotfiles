@@ -1,0 +1,29 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- clean: ['~']
+
+- link:
+    ~/.dotfiles: '~/dropbox/dev/dotfiles'
+    ~/dev: ~/dropbox/dev
+    ~/projects: ~/dropbox/projects
+    ~/.zshrc: zshrc
+    ~/.slate: slate
+    ~/.gitignore_global: gitignore_global
+    ~/.gitconfig: gitconfig
+    ~/.Brewfile: ../packages/Brewfile
+    ~/.config/:
+      glob: true
+      path: config/*
+      relink: true
+    # re-enable if want to customize oh-my-zsh
+    #~/.oh-my-zsh/custom/themes/: 
+    #  glob: true
+    #  path: oh-my-zsh/themes/*
+    #  relink: true
+    #~/.oh-my-zsh/custom/plugins/: 
+    #  glob: true
+    #  path: oh-my-zsh/plugins/*
+    #  relink: true

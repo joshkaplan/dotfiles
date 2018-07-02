@@ -1,0 +1,16 @@
+[user]
+	name = joshkaplan
+	email = joshkaplan@users.noreply.github.com
+[credential]
+	helper = osxkeychain
+[color]
+	ui = true
+[filter "media"]
+	clean = git-media-clean %f
+	smudge = git-media-smudge %f
+[push]
+	default = simple
+[core]
+	autocrlf = input # Windows / OSX filesystems don't get along without this.
+	excludesfile = ~/.gitignore_global
+
