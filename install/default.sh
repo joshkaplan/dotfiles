@@ -76,6 +76,7 @@ if [ -f ~/dev ] && [ ! -h ~/dev ]; then
 		exit 1
 	fi
 fi
+running "dotbot"
 dotbot -c "${BASEDIR}/install/default.conf.yaml" -d "${BASEDIR}/dotfiles"
 
 # TODO sync apps
@@ -104,14 +105,16 @@ if [ $UPGRADE_MODE = true ] || [ ! $INTERACTIVE_MODE = true ] || yes_no "Sync pa
 	INSTALL_CMD="brew bundle --file=\"${BASEDIR}/packages/Brewfile\" --no-upgrade"
 	SAVE_CMD="brew bundle dump --force --file=\"${BASEDIR}/packages/Brewfile\""
 	UPGRADE_CMD="brew upgrade"
-	pkg_sync Homebrew Brewfile $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $INTERACTIVE_MODE $UPGRADE_MODE
+	OUTDATED_CMD="brew outdated -v"
+	pkg_sync Homebrew Brewfile $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
 
 	# Pyton
 	DIFF_CMD="diff -y <(pip freeze) \"${BASEDIR}/packages/python_requirements.txt\""
 	INSTALL_CMD="pip install -r \"${BASEDIR}/packages/python_requirements.txt\""
 	SAVE_CMD="pip freeze > \"${BASEDIR}/packages/python_requirements.txt\""
 	UPGRADE_CMD="pip install -U"
-	pkg_sync Python requirements.txt $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $INTERACTIVE_MODE $UPGRADE_MODE 
+	OUTDATED_CMD="pip list -o"
+	pkg_sync Python requirements.txt $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
 	
 	if [ $UPGRADE_MODE = true ] || [ $INTERACTIVE_MODE = true ] && yes_no "Uppgrade oh-my-zsh?"; then 
 		action "Upgrading oh-my-zsh"

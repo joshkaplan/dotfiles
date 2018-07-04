@@ -32,8 +32,11 @@ function warn() {
 function error() {
 	echo -e "$fg_no_bold[red][error]$reset_color "$1
 }
+function cmdview() {
+	echo -e "\n$fg_no_bold[yellow][$1]:$reset_color\n"$2
+}
 function diffview() {
-	echo -e "\n$fg_no_bold[yellow][diff]:$reset_color\n"$1
+	cmdview diff $1
 }
 
 # Check requirements
@@ -50,18 +53,24 @@ function require_brew() {
 function pkg_sync() {
 	PKG_TYPE=$1
 	PKG_SOURCE=$2
-	DIFF_CMD=$3
-	INSTALL_CMD=$4
-	SAVE_CMD=$5
-	UPGADE_CMD=$6
-	INTERACTIVE_MODE=$7
-	UPGRADE_MODE=$8
+	INTERACTIVE_MODE=$3
+	UPGRADE_MODE=$4
+	DIFF_CMD=$5
+	INSTALL_CMD=$6
+	SAVE_CMD=$7
+	UPGADE_CMD=$8
+	OUTDATED_CMD=$9
+	if [ $INTERACTIVE_MODE = true ]; then
+		running "Checking outdated ${PKG_TYPE} packages"
+		OUTDATED=`eval $OUTDATED_CMD`
+		cmdview oudtated $OUTDATED
+	fi
 	if [ $UPGRADE_MODE = true ] || [ $INTERACTIVE_MODE = true ] && yes_no "Upgrade ${PKG_TYPE} packages?"; then 
 		action "Upgrading"
 		eval $UPGADE_CMD
 		ok "${PKG_SOURCE} packages upgraded to latest version"
 	fi
-	running "Checking ${PKG_TYPE} packages"
+	running "Comparing ${PKG_TYPE} packages"
 	set +e
 	DIFF=`eval $DIFF_CMD`
 	DIFF_CODE=$?
