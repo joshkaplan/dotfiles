@@ -48,9 +48,15 @@ function require_brew() {
 
 # Sync packages
 function pkg_sync() {
-	PKG_TYPE=$1; PKG_SOURCE=$2;
-	DIFF_CMD=$3; INSTALL_CMD=$4; SAVE_CMD=$5; UPGADE_CMD=$6
-	if yes_no "Upgrade ${PKG_TYPE} packages?"; then 
+	PKG_TYPE=$1
+	PKG_SOURCE=$2
+	DIFF_CMD=$3
+	INSTALL_CMD=$4
+	SAVE_CMD=$5
+	UPGADE_CMD=$6
+	INTERACTIVE_MODE=$7
+	UPGRADE_MODE=$8
+	if [ $UPGRADE_MODE = true ] || [ $INTERACTIVE_MODE = true ] && yes_no "Upgrade ${PKG_TYPE} packages?"; then 
 		action "Upgrading"
 		eval $UPGADE_CMD
 		ok "${PKG_SOURCE} packages upgraded to latest version"
