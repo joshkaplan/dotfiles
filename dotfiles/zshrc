@@ -55,7 +55,7 @@ bindkey -M menuselect '^?' undo
 ##############################
 
 # Aliases (sourced near the end so they override other defaults)
-source ./aliases.zsh
+source ~/.dotfiles/dotfiles/aliases.zsh
 
 # Local overrides
 if [ -e ~/.local.zsh ]; then
