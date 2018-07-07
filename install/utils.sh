@@ -39,16 +39,6 @@ function diffview() {
 	cmdview diff $1
 }
 
-# Check requirements
-function require_brew() {
-	running $1
-	if ! brew ls $1 > /dev/null 2>&1; then
-		action "brew install $1"
-		brew install $1
-	fi
-	ok
-}
-
 # Sync packages
 function pkg_sync() {
 	PKG_TYPE=$1

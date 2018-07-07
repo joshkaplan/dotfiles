@@ -6,7 +6,7 @@ source "${BASEDIR}/install/utils.sh"
 
 
 # read options, set mode variables
-OPTIND=1         # Reset in case getopts has been used previously in the shell.
+OPTIND=1 # reset in case getopts has been used previously in the shell.
 UPGRADE_MODE=false
 INTERACTIVE_MODE=false
 while getopts "h?ui" opt; do
@@ -45,11 +45,14 @@ if [[ $? != 0 ]]; then
 fi
 ok
 
-# TODO require dotbot (specific version probably)
+running "brew packages"
+echo 
+brew bundle --file="${BASEDIR}/packages/Brewfile_require" --no-upgrade
 
-require_brew python2
-require_brew git
-require_brew zsh
+running "pip packages"
+pip install -q -r "${BASEDIR}/packages/pip_requirements.txt"
+ok
+
 running "oh-my-zsh"
 if [ ! -d ~/.oh-my-zsh ]; then
 	action "cloning oh-my-zsh"
@@ -79,11 +82,6 @@ fi
 running "dotbot"
 dotbot -c "${BASEDIR}/install/default.conf.yaml" -d "${BASEDIR}/dotfiles"
 
-# TODO sync apps
-# Alfred plutil -p com.runningwithcrayons.Alfred-Preferences-3.plist
-# iTerm
-# 
-
 # Install packages
 # TODO ruby
 # TODO node
@@ -109,9 +107,9 @@ if [ $UPGRADE_MODE = true ] || [ ! $INTERACTIVE_MODE = true ] || yes_no "Sync pa
 	pkg_sync Homebrew Brewfile $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
 
 	# Pyton
-	DIFF_CMD="diff -y <(pip freeze) \"${BASEDIR}/packages/python_requirements.txt\""
-	INSTALL_CMD="pip install -r \"${BASEDIR}/packages/python_requirements.txt\""
-	SAVE_CMD="pip freeze > \"${BASEDIR}/packages/python_requirements.txt\""
+	DIFF_CMD="diff -y <(pip freeze) \"${BASEDIR}/packages/pip_packages.txt\""
+	INSTALL_CMD="pip install -r \"${BASEDIR}/packages/pip_packages.txt\""
+	SAVE_CMD="pip freeze > \"${BASEDIR}/packages/pip_packages.txt\""
 	UPGRADE_CMD="pip install -U"
 	OUTDATED_CMD="pip list -o"
 	pkg_sync Python requirements.txt $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
