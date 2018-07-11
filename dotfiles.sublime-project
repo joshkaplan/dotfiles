@@ -10,7 +10,7 @@
 		{
 			"path": "~/",
 			"name": "~",
-			"file_include_patterns": [".install_local.sh"],
+			"file_include_patterns": [".install_local.zsh"],
 			"folder_exclude_patterns": ["*"]
 		}
 	]

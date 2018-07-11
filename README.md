@@ -9,7 +9,7 @@ A repository for storing my configs and basic setup/installation. This is not in
 2. Navigate to this folder in a terminal (preferably iTerm2) and install:
 ```bash
 cd ~/Dropbox/dev/dotfiles
-./install/default.sh
+./install/default.zsh
 ```
 3. Finish the software setup:
 	1. Install/launch KarabinerElements.
@@ -19,11 +19,11 @@ cd ~/Dropbox/dev/dotfiles
 
 #### Sync
 
-Evrery time you want to sync, you can simply re-run install.sh from this folder.
+Evrery time you want to sync, you can simply re-run install.zsh from this folder.
 
 ```bash
 cd ~/.dotfiles
-./install/default.sh
+./install/default.zsh
 ```
 
 #### Features
@@ -34,7 +34,7 @@ cd ~/.dotfiles
 	* some application settings
 * Installs, syncs, and upgrades `brew` and `pip` packages
 * Supports private configuration via `dotfiles-private`, a private repo built with a similar structure to this one
-* Supports per-machine configuration via `~/.install_local.sh` (see `install/example_install_local.sh`)
+* Supports per-machine configuration via `~/.install_local.zsh` (see `install/example_install_local.zsh`)
 * Can be run unlimited times without issue (`install/` are all idempotent)
 
 #### Links

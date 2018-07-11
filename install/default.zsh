@@ -89,22 +89,22 @@ fi
 
 # Search for dotfiles-private (a separate git repo), and run its default install script
 if [[ -d $PRIVATE_BASEDIR ]]; then
-	eval "${PRIVATE_BASEDIR}/install/default.sh $*"
+	eval "${PRIVATE_BASEDIR}/install/default.zsh $*"
 else
 	warn "can't find dotfiles-local"
 fi
 
-# Search for ~/.install_local.sh
-if [[ -f ~/.install_local.sh ]]; then
-	~/.install_local.sh $*
+# Search for ~/.install_local.zsh
+if [[ -f ~/.install_local.zsh ]]; then
+	~/.install_local.zsh $*
 else
-	warn "can't find ~/.install_local.sh"
+	warn "can't find ~/.install_local.zsh"
 	if yes_no "Would you like create one now?"; then
-		running "Copying example_install_local.sh to ~/.install_local.sh"
-		cp "${BASEDIR}/install/example_install_local.sh" ~/.install_local.sh
+		running "Copying example_install_local.zsh to ~/.install_local.zsh"
+		cp "${BASEDIR}/install/example_install_local.zsh" ~/.install_local.zsh
 		ok
-		eval "${VISUAL} ~/.install_local.sh"
-		~/.install_local.sh $*
+		eval "${VISUAL} ~/.install_local.zsh"
+		~/.install_local.zsh $*
 	fi
 fi
 
