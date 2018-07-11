@@ -2,30 +2,24 @@
 set -e
 BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
 PRIVATE_BASEDIR=`dirname ~/Dropbox/Dev/dotfiles-private/.`
-source "${BASEDIR}/install/utils.sh"
-
+source "${BASEDIR}/utils/utils.zsh"
+source "${BASEDIR}/utils/pkg_utils.zsh"
 
 # read options, set mode variables
-OPTIND=1 # reset in case getopts has been used previously in the shell.
-UPGRADE_MODE=false
-INTERACTIVE_MODE=false
-while getopts "h?ui" opt; do
-    case "$opt" in
-    h|\?)
-        echo "By default, updates packaage managers and checks pacakge diffs"
-        echo "Options:"
-        echo "  -i  interactive mode; prompt about updating package managers, and upgrading packages"
-        echo "  -u  upgrade all packages"
-        exit 0
-        ;;
-    u)  UPGRADE_MODE=true
-        ;;
-    i)  INTERACTIVE_MODE=true
-        ;;
-    esac
-done
+zparseopts -D -E -- u=UPGRADE_MODE i=INTERACTIVE_MODE h=HELP_MODE
+if [[ $HELP_MODE ]]; then 
+	echo "By default, updates packaage managers and checks pacakge diffs"
+	echo "\nOptions:"
+	echo "    -i  interactive mode: prompt about updating package managers, and upgrading packages"
+	echo "    -u  upgrade local packages"
+	return 0
+fi
+if [[ -n $* ]]; then 
+	error "Unknown options $*"
+	return 1
+fi
 
-if [ $UPGRADE_MODE = true ] && [ $INTERACTIVE_MODE = true ]; then
+if [[ -n $UPGRADE_MODE && -n $INTERACTIVE_MODE ]]; then
 	error "don't use -i and -u together"
 	exit 1
 fi
@@ -33,7 +27,7 @@ fi
 # check/install requirements
 bot "Checking requirements"
 
-running "brew"
+running "\U1F37A  Checking brew"
 brew_bin=$(which brew) 2>&1 > /dev/null
 if [[ $? != 0 ]]; then
 	action "installing brew"
@@ -45,22 +39,17 @@ if [[ $? != 0 ]]; then
 fi
 ok
 
-running "brew packages"
-echo 
-brew bundle --file="${BASEDIR}/packages/Brewfile_require" --no-upgrade
+pkg_check_and_install -t brew -f "${BASEDIR}/packages/Brewfile_require" -e "\U1F37A" -a
+pkg_check_and_install -t pip -f "${BASEDIR}/packages/pip_requirements.txt" -e "\U1F40D" -a
 
-running "pip packages"
-pip install -q -r "${BASEDIR}/packages/pip_requirements.txt"
-ok
-
-running "oh-my-zsh"
-if [ ! -d ~/.oh-my-zsh ]; then
+running "\U1F4DF  Checking oh-my-zsh"
+if [[ ! -d ~/.oh-my-zsh ]]; then
 	action "cloning oh-my-zsh"
 	git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 fi
 ok
 
-running "checking default shell"
+running "\U1F4DF  Checking default shell"
 if [ $SHELL != "/usr/local/bin/zsh" ]; then
 	action "changing default shell to zsh"
 	chsh -s /usr/local/bin/zsh
@@ -70,7 +59,7 @@ ok
 bot "Linking stuff"
 # if ~/dev exists, move to ~/localdev
 if [ -f ~/dev ] && [ ! -h ~/dev ]; then
-	running "Moving ~/dev to ~/localdev"
+	running "\U1F4C1  Moving ~/dev to ~/localdev"
 	if [ -d ~/dev ]; then 
 		mv ~/dev ~/localdev
 		ok
@@ -79,57 +68,34 @@ if [ -f ~/dev ] && [ ! -h ~/dev ]; then
 		exit 1
 	fi
 fi
-running "dotbot"
+running "\U1F517  Running dotbot"
+echo
 dotbot -c "${BASEDIR}/install/default.conf.yaml" -d "${BASEDIR}/dotfiles"
+ok
 
 # Install packages
 # TODO ruby
 # TODO node
 bot "Syncing packages"
-if [ $UPGRADE_MODE = true ] || [ ! $INTERACTIVE_MODE = true ] || yes_no "Sync packages?"; then
-	if [ $UPGRADE_MODE = true ] || [ ! $INTERACTIVE_MODE = true ] || yes_no "Update package managers (recommended)?"; then
-		running "Updating brew"
-		echo
-		brew update
-		ok "Brew is up to date"
-		running "Updating pip"
-		echo
-		pip install pip --upgrade
-		ok "Pip is up to date"
-	fi
 
-	# Brew
-	DIFF_CMD="diff -y --suppress-common-lines <(brew bundle dump --file=-) \"${BASEDIR}/packages/Brewfile\""
-	INSTALL_CMD="brew bundle --file=\"${BASEDIR}/packages/Brewfile\" --no-upgrade"
-	SAVE_CMD="brew bundle dump --force --file=\"${BASEDIR}/packages/Brewfile\""
-	UPGRADE_CMD="brew upgrade"
-	OUTDATED_CMD="brew outdated -v"
-	pkg_sync Homebrew Brewfile $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
+pkg_sync -t brew -f "${BASEDIR}/packages/Brewfile" $UPGRADE_MODE $INTERACTIVE_MODE
+pkg_sync -t pip -f "${BASEDIR}/packages/pip_packages.txt" $UPGRADE_MODE $INTERACTIVE_MODE
 
-	# Pyton
-	DIFF_CMD="diff -y <(pip freeze) \"${BASEDIR}/packages/pip_packages.txt\""
-	INSTALL_CMD="pip install -r \"${BASEDIR}/packages/pip_packages.txt\""
-	SAVE_CMD="pip freeze > \"${BASEDIR}/packages/pip_packages.txt\""
-	UPGRADE_CMD="pip install -U"
-	OUTDATED_CMD="pip list -o"
-	pkg_sync Python requirements.txt $INTERACTIVE_MODE $UPGRADE_MODE $DIFF_CMD $INSTALL_CMD $SAVE_CMD $UPGRADE_CMD $OUTDATED_CMD
-	
-	if [ $UPGRADE_MODE = true ] || [ $INTERACTIVE_MODE = true ] && yes_no "Uppgrade oh-my-zsh?"; then 
-		action "Upgrading oh-my-zsh"
-		env ZSH=$ZSH sh $ZSH/tools/upgrade.sh
-		ok "oh-my-zsh upgraded"
-	fi
+if [[ $UPGRADE_MODE ]] || [[ $INTERACTIVE_MODE ]] && yes_no "Uppgrade oh-my-zsh?"; then 
+	action "Upgrading oh-my-zsh"
+	env ZSH=$ZSH sh $ZSH/tools/upgrade.sh
+	ok
 fi
 
 # Search for dotfiles-private (a separate git repo), and run its default install script
-if [ -d $PRIVATE_BASEDIR ]; then
+if [[ -d $PRIVATE_BASEDIR ]]; then
 	eval "${PRIVATE_BASEDIR}/install/default.sh $*"
 else
 	warn "can't find dotfiles-local"
 fi
 
 # Search for ~/.install_local.sh
-if [ -f ~/.install_local.sh ]; then
+if [[ -f ~/.install_local.sh ]]; then
 	~/.install_local.sh $*
 else
 	warn "can't find ~/.install_local.sh"
@@ -142,4 +108,4 @@ else
 	fi
 fi
 
-bot "DONE"
+echo "\n\U1F38A  Done! \U1F389"
