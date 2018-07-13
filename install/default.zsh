@@ -24,8 +24,8 @@ if [[ -n $UPGRADE_MODE && -n $INTERACTIVE_MODE ]]; then
 	exit 1
 fi
 
-# check/install requirements
-bot "Checking requirements"
+# packages
+bot "Syncing packages"
 
 running "\U1F37A  Checking brew"
 brew_bin=$(which brew) 2>&1 > /dev/null
@@ -39,8 +39,8 @@ if [[ $? != 0 ]]; then
 fi
 ok
 
-pkg_check_and_install -t brew -f "${BASEDIR}/packages/Brewfile_require" -e "\U1F37A" -a
-pkg_check_and_install -t pip -f "${BASEDIR}/packages/pip_requirements.txt" -e "\U1F40D" -a
+pkg_sync -t brew -f "${BASEDIR}/packages/Brewfile" $UPGRADE_MODE $INTERACTIVE_MODE
+pkg_sync -t pip -f "${BASEDIR}/packages/pip_packages.txt" $UPGRADE_MODE $INTERACTIVE_MODE
 
 running "\U1F4DF  Checking oh-my-zsh"
 if [[ ! -d ~/.oh-my-zsh ]]; then
@@ -55,6 +55,12 @@ if [ $SHELL != "/usr/local/bin/zsh" ]; then
 	chsh -s /usr/local/bin/zsh
 fi
 ok
+
+if [[ $UPGRADE_MODE ]] || [[ $INTERACTIVE_MODE ]] && yes_no "Uppgrade oh-my-zsh?"; then 
+	action "Upgrading oh-my-zsh"
+	env ZSH=$ZSH sh $ZSH/tools/upgrade.sh
+	ok
+fi
 
 bot "Linking stuff"
 # if ~/dev exists, move to ~/localdev
@@ -74,20 +80,6 @@ action "\U1F517  dotbot dropbox directories"
 set +e
 dotbot -q -c "${BASEDIR}/install/dropbox_dir.conf.yaml" -d "${BASEDIR}/dotfiles"
 set -e
-
-# Install packages
-# TODO ruby
-# TODO node
-bot "Syncing packages"
-
-pkg_sync -t brew -f "${BASEDIR}/packages/Brewfile" $UPGRADE_MODE $INTERACTIVE_MODE
-pkg_sync -t pip -f "${BASEDIR}/packages/pip_packages.txt" $UPGRADE_MODE $INTERACTIVE_MODE
-
-if [[ $UPGRADE_MODE ]] || [[ $INTERACTIVE_MODE ]] && yes_no "Uppgrade oh-my-zsh?"; then 
-	action "Upgrading oh-my-zsh"
-	env ZSH=$ZSH sh $ZSH/tools/upgrade.sh
-	ok
-fi
 
 # Search for dotfiles-private (a separate git repo), and run its default install script
 if [[ -d $PRIVATE_BASEDIR ]]; then

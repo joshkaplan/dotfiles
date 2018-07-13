@@ -1,6 +1,0 @@
-tap "gapple/services"
-tap "homebrew/bundle"
-tap "homebrew/core"
-brew "git"
-brew "python@2"
-brew "zsh"
