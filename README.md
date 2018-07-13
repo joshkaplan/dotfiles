@@ -35,8 +35,6 @@ Evrery time you want to sync, you can simply re-run `install`, which is aliased 
 * [atomantic/dotfiles](https://github.com/atomantic/dotfiles)
 * [homebrew](https://brew.sh/)
 * [pip](https://pypi.org/project/pip/)
-* [iTerm2](https://www.iterm2.com/) (and [colors](https://github.com/mbadolato/iTerm2-Color-Schemes))
 * [Dropbox](https://db.tt/x739XBiN)
-* [Alfred](https://www.alfredapp.com/)
 * [KarabinerElements](https://github.com/tekezo/Karabiner-Elements)
 * [slate](https://github.com/mattr-/slate) (no longer maintained, but still works; I'll switch to [Hammerspoon](https://github.com/Hammerspoon/hammerspoon) or [Phoenix](https://github.com/kasper/phoenix) at some point)
