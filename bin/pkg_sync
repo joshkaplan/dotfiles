@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+set -e
+BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
+source "${BASEDIR}/utils/pkg_utils.zsh"
+pkg_sync $*

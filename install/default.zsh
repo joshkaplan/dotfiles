@@ -108,4 +108,9 @@ else
 	fi
 fi
 
+# Launch essential applications
+bot "Launching apps"
+ps -ef | grep Karabiner-Elements | grep -v "grep" >/dev/null || (running "Opening Karabiner-Elements" && open /Applications/Karabiner-Elements.app && ok)
+ps -ef | grep Slate | grep -v "grep" >/dev/null || (running "Opening Slate" && open /Applications/Slate.app && ok)
+
 echo "\n\U1F38A  Done! \U1F389"

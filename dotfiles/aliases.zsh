@@ -24,6 +24,13 @@ file-to-clipboard() {
         "$@"
 }
 
+# Install commands
+function dot() {
+	CMD=$1
+	shift
+	eval "~/.dotfiles/bin/$CMD $*"
+}
+
 # Git Commands
 alias gla="gl && git submodule update --init --recursive"
 alias gl='git pull --rebase'
