@@ -11,11 +11,25 @@ function yes_no() {
 	return $response
 }
 
+function check_and_open_app() {
+	running $2
+	if ps -ef | grep $2 | grep -v "grep" >/dev/null; then
+		ok "already running"
+	else
+		open $1
+		ok "opened"
+	fi
+}
+
 # Colorized echo helpers
 autoload colors
 colors
 function ok() {
-	echo -e "\U2705"
+	ok_message=$1;
+	if [[ -z $ok_message ]]; then
+		ok_message="ok"
+	fi
+	echo -e "\U2705  ${fg_no_bold[green]}[${ok_message}]${reset_color}"
 }
 function bot() {
 	echo -e "\n\U1F916 " $1

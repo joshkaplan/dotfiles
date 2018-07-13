@@ -59,7 +59,7 @@ ok
 bot "Linking stuff"
 # if ~/dev exists, move to ~/localdev
 if [ -f ~/dev ] && [ ! -h ~/dev ]; then
-	running "\U1F4C1  Moving ~/dev to ~/localdev"
+	action "\U1F4C1  Moving ~/dev to ~/localdev"
 	if [ -d ~/dev ]; then 
 		mv ~/dev ~/localdev
 		ok
@@ -68,10 +68,12 @@ if [ -f ~/dev ] && [ ! -h ~/dev ]; then
 		exit 1
 	fi
 fi
-running "\U1F517  Running dotbot"
-echo
-dotbot -c "${BASEDIR}/install/default.conf.yaml" -d "${BASEDIR}/dotfiles"
-ok
+action "\U1F517  dotbot defaults"
+dotbot -q -c "${BASEDIR}/install/default.conf.yaml" -d "${BASEDIR}/dotfiles"
+action "\U1F517  dotbot dropbox directories"
+set +e
+dotbot -q -c "${BASEDIR}/install/dropbox_dir.conf.yaml" -d "${BASEDIR}/dotfiles"
+set -e
 
 # Install packages
 # TODO ruby
@@ -110,7 +112,7 @@ fi
 
 # Launch essential applications
 bot "Launching apps"
-ps -ef | grep Karabiner-Elements | grep -v "grep" >/dev/null || (running "Opening Karabiner-Elements" && open /Applications/Karabiner-Elements.app && ok)
-ps -ef | grep Slate | grep -v "grep" >/dev/null || (running "Opening Slate" && open /Applications/Slate.app && ok)
+check_and_open_app /Applications/Karabiner-Elements.app Karabiner-Elements
+check_and_open_app /Applications/Slate.app Slate
 
 echo "\n\U1F38A  Done! \U1F389"

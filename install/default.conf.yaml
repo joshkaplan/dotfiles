@@ -7,8 +7,6 @@
 
 - link:
     ~/.dotfiles: '..'
-    ~/dev: ~/dropbox/dev            # TODO should probably be a separeate, optional conf
-    ~/projects: ~/dropbox/projects  # TODO should probably be a separeate, optional conf
     ~/.zshrc: zshrc
     ~/.slate: slate
     ~/.gitignore_global: gitignore_global

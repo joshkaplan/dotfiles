@@ -1,0 +1,8 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- link:
+    ~/dev: ~/dropbox/dev
+    ~/projects: ~/dropbox/projects
