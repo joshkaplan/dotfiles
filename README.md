@@ -1,6 +1,6 @@
 # Josh Kaplan's Dotfiles
 
-A repository for storing my configs and basic setup/installation. This is not intended to be direclty usable to anyone but myself, but most of it is be fairly user agnostic.
+A repository for storing my configs and basic setup/installation. This is not intended to be direclty usable to anyone but myself, but most of it is fairly user agnostic.
 
 #### Initial Setup
 
