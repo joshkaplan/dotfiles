@@ -52,3 +52,9 @@ alias gph="git push && ghcr"
 alias glanph="glanp && ghcr"
 alias gsu="git submodule update --init --recursive"
 alias gsth="git stash"
+function pre-commit() {
+	cd "`git rev-parse --show-toplevel`"
+	./.git/hooks/pre-commit
+	cd -
+}
+alias gpc=pre-commit
