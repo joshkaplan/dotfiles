@@ -1,5 +1,77 @@
 #!/usr/bin/env zsh
 set -e
 BASEDIR=$(cd "$(dirname "${0:A}")/.." && pwd)
+source "${BASEDIR}/utils/utils.zsh"
 source "${BASEDIR}/utils/pkg_utils.zsh"
-pkg_sync $*
+
+# Process and validate args
+zparseopts -D -E -- t:=PKG_TYPE f:=FILE u=UPGRADE_MODE i=INTERACTIVE_MODE h=HELP_MODE
+if [[ $HELP_MODE ]]; then 
+	echo "By default, updates packaage managers and checks pacakge diffs"
+	echo "\nUsage:"
+	echo "    pkg_sync -f file -t type [-i|-u]"
+	echo "\nOptions:"
+	echo "    -i  interactive mode"
+	echo "    -u  upgrade local packages"
+	return 0
+fi
+if [[ -n $* ]]; then 
+	error "Unknown options $*"
+	return 1
+fi
+PKG_TYPE=$PKG_TYPE[2]
+FILE=$FILE[2]
+FILENAME="${FILE##*/}"
+case "$PKG_TYPE" in
+	brew)
+		EMOJI="\U1F37A"
+		;;
+	pip)
+		EMOJI="\U1F40D"
+		;;
+	*)
+		error "unknown package manager $PKG_TYPE"
+		return 1
+esac
+if [[ ! -f $FILE ]]; then
+	error "Invalid file '${FILE}'"
+	return 1
+fi
+
+# Update package manager (yes bey default)
+if [[ -z $INTERACTIVE_MODE ]] || yes_no "Would you like to update ${PKG_TYPE} (recommended)?"; then 
+	running "${EMOJI}  Updating ${PKG_TYPE}"
+	pkg_update $PKG_TYPE
+	ok
+fi
+
+# Check outdated / upgrade
+if [[ -n $INTERACTIVE_MODE ]]; then
+	running "${EMOJI}  Checking outdated ${PKG_TYPE} packages"
+	OUTDATED=`pkg_outdated $PKG_TYPE`
+	cmdview outdated $OUTDATED
+fi
+if [[ -n $UPGRADE_MODE ]] || [[ -n $INTERACTIVE_MODE ]] && yes_no "Would you like to upgrade these ${PKG_TYPE} packages?"; then 
+	action "Upgrading"
+	pkg_upgrade $PKG_TYPE
+	ok "${PKG_TYPE} packages upgraded to latest version"
+fi
+
+# Check if packages from file are installed
+pkg_check_and_install -t $PKG_TYPE -f $FILE -e $EMOJI
+
+# Check diff between local and file (INTERACTIVE MODE)
+if [[ -n $INTERACTIVE_MODE ]]; then 
+	running "${EMOJI}  Checking if local packages are in sync with ${FILENAME}"
+	CHECK=`pkg_check_diff $PKG_TYPE $FILE`
+	if [[ -z  $CHECK ]] ; then
+		ok
+	else
+		cmdview "diff" $CHECK
+		if yes_no "Save local packages (left) to ${FILENAME} (right)?"; then
+			action "Saving"
+			pkg_save $PKG_TYPE $FILE
+			ok 	"${PKG_TYPE} packages saved to ${FILE}"
+		fi
+	fi
+fi
