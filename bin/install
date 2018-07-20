@@ -1,3 +1,4 @@
 #!/usr/bin/env zsh
-BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
-${BASEDIR}/install/default.zsh
+export BASEDIR=$(cd "$(dirname "${0:A}")/.." && pwd)
+export PRIVATE_BASEDIR="${BASEDIR}-private"
+${BASEDIR}/install/default.zsh $*

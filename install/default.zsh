@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 set -e
-BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
-PRIVATE_BASEDIR=`dirname ~/Dropbox/Dev/dotfiles-private/.`
 source "${BASEDIR}/utils/utils.zsh"
 source "${BASEDIR}/utils/pkg_utils.zsh"
 

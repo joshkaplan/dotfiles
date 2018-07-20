@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
 set -e
-BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
+BASEDIR=$(cd "$(dirname "${0:A}")/.." && pwd)
 source "${BASEDIR}/utils/pkg_utils.zsh"
 pkg_sync $*

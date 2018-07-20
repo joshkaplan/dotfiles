@@ -142,7 +142,6 @@ function pkg_check_and_install() {
 
 function pkg_sync() {
 	set -e
-	BASEDIR=`dirname ~/Dropbox/Dev/dotfiles/.`
 	source "${BASEDIR}/utils/utils.zsh"
 
 	# Process and validate args
