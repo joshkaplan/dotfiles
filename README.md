@@ -4,6 +4,14 @@ A repository for storing my configs and basic setup/installation. This is not in
 
 #### Initial Setup
 
+__With Clone:__
+```bash
+git clone https://github.com/joshkaplan/dotfiles.git
+./dotfiles/bin/install
+```
+
+__With Dropbox:__
+
 1. Install [Dropbox](https://db.tt/x739XBiN), sync selectively. 
 2. Run install:
 ```bash
