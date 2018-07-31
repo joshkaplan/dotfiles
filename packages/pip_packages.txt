@@ -1,3 +1,3 @@
 dotbot==1.12.4
 PyYAML==3.12
-xkcdpass==1.14.3
+xkcdpass==1.16.5
