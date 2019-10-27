@@ -15,7 +15,7 @@
     ~/.config/:
       glob: true
       path: config/*
-      relink: true
+    ~/.hammerspoon: hammerspoon
     # re-enable if want to customize oh-my-zsh
     #~/.oh-my-zsh/custom/themes/: 
     #  glob: true

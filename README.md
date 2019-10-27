@@ -41,4 +41,4 @@ Evrery time you want to sync, you can simply re-run `install`, which is aliased 
 * [pip](https://pypi.org/project/pip/)
 * [Dropbox](https://db.tt/x739XBiN)
 * [KarabinerElements](https://github.com/tekezo/Karabiner-Elements)
-* [slate](https://github.com/mattr-/slate) (no longer maintained, but still works; I'll switch to [Hammerspoon](https://github.com/Hammerspoon/hammerspoon) or [Phoenix](https://github.com/kasper/phoenix) at some point)
+* [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)
