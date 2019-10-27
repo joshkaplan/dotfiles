@@ -1,3 +1,4 @@
-dotbot==1.12.4
-PyYAML==3.12
-xkcdpass==1.16.5
+dotbot==1.16.0
+gpg==1.13.1
+PyYAML==3.13
+xkcdpass==1.17.3
