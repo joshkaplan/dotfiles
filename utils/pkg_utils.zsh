@@ -3,26 +3,30 @@
 # Utilites for managing and syncing global packages
 # Author: Josh Kaplan
 
+# check if file is installed
 function pkg_check_file() {
 	_pkg_check $*
 }
+
+# check if local stuff is in the file
 function pkg_check_local() {
 	_pkg_check -l $*
 }
+
+# show the diff
 function pkg_check_diff() {
 	_pkg_check -d $*
 }
 # Checks installed packages against a file
-# Outputs missing packages if there are any; otherwise blank
-# Return code is always 0 except on error
+# Return code is 1 if their is a diff
 function _pkg_check() {
 	zparseopts -D -E -- l=LOCAL_MODE d=DIFF_MODE
 	case "$1" in
 		brew)
-			LOCAL=`brew bundle dump --file=-`
+			local LOCAL="brew bundle dump --file=-"
 			;;
 		pip)
-			LOCAL=`pip freeze`
+			local LOCAL="pip3 freeze"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -36,27 +40,30 @@ function _pkg_check() {
 	else
 		OPTIONS="--old-line-format='' --unchanged-line-format=''"
 	fi
+
 	set +e
-	DIFF=`eval diff $OPTIONS <(echo $LOCAL) $2`
+	local CMD="diff $OPTIONS <($LOCAL) $2"
+	local DIFF=$(eval $CMD)
 	CODE=$?
 	set -e
+	fake_run $CMD $DIFF
+
 	if [[ $CODE -gt 1 ]]; then
 		error "problem with diff"
 		return $CODE
 	elif [[ -z $DIFF ]]; then
 		return 0
 	fi
-	echo $DIFF
-	return 0
+	return 1
 }
 
 function pkg_install() {
 	case "$1" in
 		brew)
-			brew bundle --file=$2 --no-upgrade
+			run "brew bundle -v --file=$2 --no-upgrade"
 			;;
 		pip)
-			pip install -r $2
+			run "pip3 install -r $2"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -67,10 +74,10 @@ function pkg_install() {
 function pkg_save() {
 	case "$1" in
 		brew)
-			brew bundle dump --force --file=$2
+			run "brew bundle dump --force --file=$2"
 			;;
 		pip)
-			pip freeze > $2
+			run "pip3 freeze > $2"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -81,10 +88,11 @@ function pkg_save() {
 function pkg_upgrade() {
 	case "$1" in
 		brew)
-			brew upgrade
+			run "brew upgrade"
 			;;
 		pip)
-			pip install -U
+			# run "pip3 install -U"
+			warn "pip does not support a bulk upgrade; you will need to run 'pip install -U' for each package"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -95,10 +103,10 @@ function pkg_upgrade() {
 function pkg_outdated() {
 	case "$1" in
 		brew)
-			brew outdated -v
+			run "brew outdated -v"
 			;;
 		pip)
-			pip list -o
+			run "pip3 list -o"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -109,10 +117,10 @@ function pkg_outdated() {
 function pkg_update() {
 	case "$1" in
 		brew)
-			brew update > /dev/null
+			run "brew update"
 			;;
 		pip)
-			pip install pip --upgrade > /dev/null
+			run "pip3 install pip --upgrade"
 			;;
 		*)
 			error "unknown package manager $1"
@@ -126,16 +134,11 @@ function pkg_check_and_install() {
 	FILE=$FILE[2]
 	EMOJI=$EMOJI[2]
 	FILENAME="${FILE##*/}" 
-	running "${EMOJI}  Checking ${PKG_TYPE} packages"
-	CHECK=`pkg_check_file $PKG_TYPE $FILE`
-	if [[ -z $CHECK ]] ; then
-		ok
-	else
-		cmdview "not installed" $CHECK
+	action "Checking if ${PKG_TYPE} packages are installed ${EMOJI}"
+	if ! pkg_check_file $PKG_TYPE $FILE; then
 		if [[ -n $AUTO_INSTALL ]] || yes_no "Would you like to install these ${PKG_TYPE} packages?"; then
-			action "Installing"
+			action "Installing packages ${EMOJI}"
 			pkg_install $PKG_TYPE $FILE
-			ok 	"${PKG_TYPE} packages installed from ${FILENAME}"
 		fi
 	fi
 }

@@ -38,23 +38,20 @@ if [[ ! -f $FILE ]]; then
 	return 1
 fi
 
-# Update package manager (yes bey default)
+# Update package manager (yes by default)
 if [[ -z $INTERACTIVE_MODE ]] || yes_no "Would you like to update ${PKG_TYPE} (recommended)?"; then 
-	running "${EMOJI}  Updating ${PKG_TYPE}"
+	action "Updating ${PKG_TYPE} ${EMOJI}"
 	pkg_update $PKG_TYPE
-	ok
 fi
 
 # Check outdated / upgrade
 if [[ -n $INTERACTIVE_MODE ]]; then
-	running "${EMOJI}  Checking outdated ${PKG_TYPE} packages"
-	OUTDATED=`pkg_outdated $PKG_TYPE`
-	cmdview outdated $OUTDATED
+	action "Checking outdated ${PKG_TYPE} packages ${EMOJI}"
+	pkg_outdated $PKG_TYPE
 fi
 if [[ -n $UPGRADE_MODE ]] || [[ -n $INTERACTIVE_MODE ]] && yes_no "Would you like to upgrade these ${PKG_TYPE} packages?"; then 
-	action "Upgrading"
+	action "Upgrading ${PKG_TYPE} ${EMOJI}"
 	pkg_upgrade $PKG_TYPE
-	ok "${PKG_TYPE} packages upgraded to latest version"
 fi
 
 # Check if packages from file are installed
@@ -62,16 +59,11 @@ pkg_check_and_install -t $PKG_TYPE -f $FILE -e $EMOJI
 
 # Check diff between local and file (INTERACTIVE MODE)
 if [[ -n $INTERACTIVE_MODE ]]; then 
-	running "${EMOJI}  Checking if local packages are in sync with ${FILENAME}"
-	CHECK=`pkg_check_diff $PKG_TYPE $FILE`
-	if [[ -z  $CHECK ]] ; then
-		ok
-	else
-		cmdview "diff" $CHECK
+	action "Checking if local packages are in sync with ${FILENAME} ${EMOJI}"
+	if ! pkg_check_diff $PKG_TYPE $FILE; then
 		if yes_no "Save local packages (left) to ${FILENAME} (right)?"; then
-			action "Saving"
+			action "Saving packages"
 			pkg_save $PKG_TYPE $FILE
-			ok 	"${PKG_TYPE} packages saved to ${FILE}"
 		fi
 	fi
 fi

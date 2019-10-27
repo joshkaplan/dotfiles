@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-set -e
-~/.dotfiles/bin/install_home 			# machine specific install file (this file doesn't actually exist, just an exmaple)
-~/.dotfiles-private/bin/install_home 	# private machine specific install file
