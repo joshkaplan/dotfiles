@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+set -e
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)  # https://tinyurl.com/y5kkhfrd, https://tinyurl.com/ydxeax8k
+BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
+PRIVATE_BASEDIR="${BASEDIR}-private"
+source "${BASEDIR}/utils/output.zsh"
+
+section "executing local scripts"
+
+# Search for ./install_local
+local LOCAL_INSTALL="${BASEDIR}/bin/install_local"
+if [[ -f $LOCAL_INSTALL ]]; then
+	eval "$LOCAL_INSTALL $*"
+else
+	warn "can't find ./install_local"
+	action "Searching for install files (you will need to run/link these manually):"
+	run "find ${PRIVATE_BASEDIR}/bin -name \"*install*\""
+	run "find ${BASEDIR}/bin -name \"*install*\""
+fi
+
+end_section "executing local scripts"

@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+set -e
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)  # https://tinyurl.com/y5kkhfrd, https://tinyurl.com/ydxeax8k
+BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
+source "${BASEDIR}/utils/output.zsh"
+
+section "linking stuff"
+
+# if ~/dev exists, move to ~/localdev
+if [ -f ~/dev ] && [ ! -h ~/dev ]; then
+	action "Moving ~/dev to ~/localdev"
+	if [ -d ~/dev ]; then
+	  local cmd="mv ~/dev ~/localdev"
+		run $cmd
+	else
+		error "\"~/Dev\" already exists, but it's not a directory"
+		exit 1
+	fi
+fi
+action "Linking dotfiles"
+run "dotbot -q -c \"${BASEDIR}/dotfiles/default.conf.yaml\" -d \"${BASEDIR}/dotfiles\""
+set +e
+run "dotbot -q -c \"${BASEDIR}/dotfiles/dropbox_dir.conf.yaml\" -d \"${BASEDIR}/dotfiles\""
+set -e
+
+end_section "linking stuff"

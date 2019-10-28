@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+set -e
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)  # https://tinyurl.com/y5kkhfrd, https://tinyurl.com/ydxeax8k
+BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
+source "${BASEDIR}/utils/output.zsh"
+source "${BASEDIR}/utils/utils.zsh"
+
+section "misc stuff"
+
+# check_and_open_app /Applications/Karabiner-Elements.app Karabiner-Elements (doesn't work properly)
+check_and_open_app /Applications/Hammerspoon.app Hammerspoon
+
+action "Checking default shell"
+local default_shell="/usr/local/bin/zsh"
+if ! run "grep -Fx \"$default_shell\" /etc/shells"; then
+	action "Adding $default_shell to /etc/shells (requires sudo)"
+	run "sudo sh -c \"echo $default_shell >> /etc/shells\""
+fi
+if [ $SHELL != $default_shell ]; then
+	action "Changing default shell to $default_shell"
+	run "chsh -s $default_shell"
+fi
+
+if [[ ! -d ~/.oh-my-zsh ]]; then
+  action "Cloning oh-my-zsh"
+  run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
+fi
+
+end_section "misc stuff"

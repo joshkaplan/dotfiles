@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+set -e
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)  # https://tinyurl.com/y5kkhfrd, https://tinyurl.com/ydxeax8k
+BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
+PRIVATE_BASEDIR="${BASEDIR}-private"
+source "${BASEDIR}/utils/output.zsh"
+
+section "executing private scripts"
+
+# Search for dotfiles-private (a separate git repo), and run its default install script
+if [[ -d $PRIVATE_BASEDIR ]]; then
+	${PRIVATE_BASEDIR}/bin/install $* || warn "found dotfiles-private, but no bin/install"
+else
+	warn "can't find dotfiles-local"
+fi
+
+end_section "executing private scripts"

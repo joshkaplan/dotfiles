@@ -1,156 +1,55 @@
 #!/usr/bin/env zsh
 set -e
-BASEDIR=$(cd "$(dirname "${0:A}")/.." && pwd)
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)  # https://tinyurl.com/y5kkhfrd, https://tinyurl.com/ydxeax8k
+BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
 PRIVATE_BASEDIR="${BASEDIR}-private"
-TARGET_DIR="~/dropbox/dev/dotfiles"
+source "${BASEDIR}/utils/output.zsh"
 source "${BASEDIR}/utils/utils.zsh"
 source "${BASEDIR}/utils/pkg_utils.zsh"
 
+# SETUP
+##############################
+
 # check if dotfiles is installed to TARGET_DIR
 # note: choose to not move it into TARGET_DIR automatically, since it will be synced via dropbox
+TARGET_DIR="$HOME/dropbox/dev/dotfiles"
 if [[ -d $TARGET_DIR && -x $TARGET_DIR/bin/install && $TARGET_DIR:l != $BASEDIR:l ]]; then
 	if yes_no "Running dotfiles from ${BASEDIR}. Would you like to delete this copy and switch to ${TARGET_DIR}?"; then
 		rmtrash $BASEDIR
 		$TARGET_DIR/bin/install $*
-		return 0
+		exit 0
 	fi
 fi
 
-# read options, set mode variables
-zparseopts -D -E -- u=UPGRADE_MODE i=INTERACTIVE_MODE h=HELP_MODE np=SKIP_PACKAGES p=PACKAGES_ONLY
-if [[ $HELP_MODE ]]; then 
-	echo "By default, updates packaage managers and checks pacakge diffs"
-	echo "\nOptions:"
-	echo "    -i  interactive mode: prompt about updating package managers, and upgrading packages"
-	echo "    -u  upgrade local packages"
-	echo "    -np skip packages"
-	echo "    -p  packages only"
-	return 0
+if ! which brew > /dev/null; then
+  action "Installing brew \U1F37A"
+  if ! run "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""; then
+    error "unable to install brew, script $0 abort!"
+    exit 1
+  fi
 fi
-if [[ -n $* ]]; then 
-	error "Unknown options $*"
-	return 1
-fi
-if [[ -n $UPGRADE_MODE && -n $INTERACTIVE_MODE ]]; then
-	error "don't use -i and -u together"
-	exit 1
-fi
-if [[ -n $UPGRADE_MODE || -n $INTERACTIVE_MODE && -n $SKIP_PACKAGES ]]; then
-	error "don't use -i or -u with -np"
-	exit 1
-fi
-if [[ -n $SKIP_PACKAGES && -n $PACKAGES_ONLY ]]; then
-	error "don't use -p and -np together"
-	exit 1
-fi
-
 
 # PACKAGES
 ##############################
 
-function packages() {
-  section "syncing packages"
+section "syncing packages"
 
-  action "Checking brew \U1F37A"
-  if ! run "which brew"; then
-    action "installing brew"
-    if ! run "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""; then
-      error "unable to install brew, script $0 abort!"
-      exit 1
-    fi
-  fi
+$BASEDIR/bin/pkg -t brew -I -u -F -f "${BASEDIR}/packages/Brewfile"
+$BASEDIR/bin/pkg -t pip  -I -u -F -f "${BASEDIR}/packages/pip_packages.txt"
 
-  $BASEDIR/bin/pkg_sync -t brew -f "${BASEDIR}/packages/Brewfile" $UPGRADE_MODE $INTERACTIVE_MODE
-  $BASEDIR/bin/pkg_sync -t pip -f "${BASEDIR}/packages/pip_packages.txt" $UPGRADE_MODE $INTERACTIVE_MODE
-
-  if [[ ! -d ~/.oh-my-zsh ]]; then
-    action "Cloning oh-my-zsh"
-    run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
-  fi
-
-  if [[ $UPGRADE_MODE ]] || [[ $INTERACTIVE_MODE ]] && yes_no "Uppgrade oh-my-zsh?"; then
-    action "Upgrading oh-my-zsh"
-    run "env ZSH=$ZSH sh $ZSH/tools/upgrade.sh"
-  fi
-
-  end_section "syncing packages"
-}
-
-if [[ ! $SKIP_PACKAGES ]]; then
-  packages $*
-  if [[ $PACKAGES_ONLY ]]; then
-    return 0
-  fi
-fi
+end_section "syncing packages"
 
 # LINKING
 ##############################
-
-section "linking stuff"
-# if ~/dev exists, move to ~/localdev
-if [ -f ~/dev ] && [ ! -h ~/dev ]; then
-	action "Moving ~/dev to ~/localdev"
-	if [ -d ~/dev ]; then
-	  local cmd="mv ~/dev ~/localdev"
-		run $cmd
-	else
-		error "\"~/Dev\" already exists, but it's not a directory"
-		exit 1
-	fi
-fi
-action "Linking dotfiles"
-run "dotbot -q -c \"${BASEDIR}/dotfiles/default.conf.yaml\" -d \"${BASEDIR}/dotfiles\""
-set +e
-run "dotbot -q -c \"${BASEDIR}/dotfiles/dropbox_dir.conf.yaml\" -d \"${BASEDIR}/dotfiles\""
-set -e
-end_section "linking stuff"
-
+$BASEDIR/bin/link $*
 
 # PRIVATE / LOCAL
 ##############################
-
-section "Executing private/local scripts"
-
-# Search for dotfiles-private (a separate git repo), and run its default install script
-if [[ -d $PRIVATE_BASEDIR ]]; then
-	${PRIVATE_BASEDIR}/bin/install $* || warn "found dotfiles-private, but no bin/install"
-else
-	warn "can't find dotfiles-local"
-fi
-
-# Search for ./install_local
-local LOCAL_INSTALL="${BASEDIR}/bin/install_local"
-if [[ -f $LOCAL_INSTALL ]]; then
-	eval "$LOCAL_INSTALL $*"
-else
-	warn "can't find ./install_local"
-	action "Searching for install files (you will need to run/link these manually):"
-	run "find ${PRIVATE_BASEDIR}/bin -name \"*install*\""
-	run "find ${BASEDIR}/bin -name \"*install*\""
-fi
-
-end_section "Executing private/local scripts"
-
+$BASEDIR/bin/private $*
+$BASEDIR/bin/local $*
 
 # MISC
 ##############################
-
-section "misc stuff"
-
-# check_and_open_app /Applications/Karabiner-Elements.app Karabiner-Elements (doesn't work properly)
-check_and_open_app /Applications/Hammerspoon.app Hammerspoon
-
-action "Checking default shell"
-local default_shell="/usr/local/bin/zsh"
-if ! run "grep -Fx \"$default_shell\" /etc/shells"; then
-	action "Adding $default_shell to /etc/shells (requires sudo)"
-	run "sudo sh -c \"echo $default_shell >> /etc/shells\""
-fi
-if [ $SHELL != $default_shell ]; then
-	action "Changing default shell to $default_shell"
-	run "chsh -s $default_shell"
-fi
-
-end_section "misc stuff"
+$BASEDIR/bin/misc $*
 
 echo "\n\U1F38A  Done! \U1F389"
