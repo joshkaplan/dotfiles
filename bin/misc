@@ -24,7 +24,7 @@ if [ $SHELL != $default_shell ]; then
 	run "chsh -s $default_shell"
 fi
 
-# Oh My ZSJ
+# Oh My ZSH
 if [[ ! -d ~/.oh-my-zsh ]]; then
   action "Cloning oh-my-zsh"
   run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
@@ -47,6 +47,12 @@ fi
 if ! xcode-select -p > /dev/null; then
   action "Installing xcode"
   xcode-select --install
+fi
+
+# Shell integration
+if [[ ! -e "${HOME}/.iterm2_shell_integration.zsh" ]]; then
+  action "Installing shell integration"
+  run "curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash"
 fi
 
 end_section "misc stuff"
