@@ -16,6 +16,7 @@
       glob: true
       path: config/*
     ~/.hammerspoon: hammerspoon
+    ~/.ssh/config: ssh/config
     # re-enable if want to customize oh-my-zsh
     #~/.oh-my-zsh/custom/themes/: 
     #  glob: true

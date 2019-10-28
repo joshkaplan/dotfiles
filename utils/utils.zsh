@@ -11,6 +11,11 @@ function yes_no() {
 	return $response
 }
 
+function prompt() {
+	echo -en "\U1F64B\U200D\U2642 $1 "
+	read $2
+}
+
 function check_and_open_app() {
 	action "Checking if $2 is running"
 	if ! run "ps -ef | grep $2 | grep -v grep"; then

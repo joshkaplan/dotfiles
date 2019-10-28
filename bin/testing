@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+set -e
+CURRENT_DIR=$(cd "$(dirname "${0:A}")" && pwd)
+cd $CURRENT_DIR
+
+source ../utils/utils.zsh
+
+prompt "Enter a comment for the key (email address is fine):" comment
+
+echo $comment
+
+#echo "some shite"
+#read comment
+#echo "some shit $comment"
+

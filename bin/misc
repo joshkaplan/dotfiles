@@ -26,4 +26,16 @@ if [[ ! -d ~/.oh-my-zsh ]]; then
   run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
 fi
 
+# https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+# https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
+if [[ ! -e ~/.ssh/id_rsa.pub ]]; then
+  action "No SSH key found; generating one"
+  prompt "Enter a comment for the key (email address is fine):" comment
+  run "ssh-keygen -t rsa -b 4096 -C $comment"
+  run "eval \"$(ssh-agent -s)\""
+  run "ssh-add -K ~/.ssh/id_rsa"
+  run "pbcopy < ~/.ssh/id_rsa.pub"
+  warn "Key copied to clipboard. Add it where needed (e.g. https://github.com/settings/keys)"
+fi
+
 end_section "misc stuff"
