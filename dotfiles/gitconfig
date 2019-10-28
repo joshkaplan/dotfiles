@@ -13,4 +13,5 @@
 [core]
 	autocrlf = input # Windows / OSX filesystems don't get along without this.
 	excludesfile = ~/.gitignore_global
-
+[include]
+	path = ~/.gitconfig_local
