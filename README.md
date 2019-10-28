@@ -14,11 +14,16 @@ __Manual:__
 2. Open a terminal and cd into this package's `bin` folder
 3. Run `./install`
 
-#### Sync
+#### CLI
 
-Evrery time you want to sync, you can simply re-run `install`, which is aliased to:
+Once installed, all scripts are aliased to `dot`:
 ```bash
- dot install
+dot install # run the full install script 
+dot link    # run just dotfile linking
+dot private # run just the private install script
+dot local   # run just the local install script
+dot misc    # run just the misc parts of `install`
+dot pkg     # CLI tool for advanced/dynamic package management; run with -h for full set of options
 ```
 
 #### Features
