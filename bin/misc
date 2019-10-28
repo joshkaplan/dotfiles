@@ -7,10 +7,12 @@ source "${BASEDIR}/utils/utils.zsh"
 
 section "misc stuff"
 
+# Apps
 # name, grep, path to open
 check_and_open_app Karabiner Karabiner-Menu.app /Applications/Karabiner-Elements.app
 check_and_open_app Hammerspoon Hammerspoon /Applications/Hammerspoon.app
 
+# Default Shell
 action "Checking default shell"
 local default_shell="/usr/local/bin/zsh"
 if ! run "grep -Fx \"$default_shell\" /etc/shells"; then
@@ -22,11 +24,13 @@ if [ $SHELL != $default_shell ]; then
 	run "chsh -s $default_shell"
 fi
 
+# Oh My ZSJ
 if [[ ! -d ~/.oh-my-zsh ]]; then
   action "Cloning oh-my-zsh"
   run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
 fi
 
+# SSH
 # https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 # https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
 if [[ ! -e ~/.ssh/id_rsa.pub ]]; then
@@ -37,6 +41,12 @@ if [[ ! -e ~/.ssh/id_rsa.pub ]]; then
   run "ssh-add -K ~/.ssh/id_rsa"
   run "pbcopy < ~/.ssh/id_rsa.pub"
   warn "Key copied to clipboard. Add it where needed (e.g. https://github.com/settings/keys)"
+fi
+
+# Xcode
+if ! xcode-select -p > /dev/null; then
+  action "Installing xcode"
+  xcode-select --install
 fi
 
 end_section "misc stuff"
