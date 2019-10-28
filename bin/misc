@@ -7,8 +7,9 @@ source "${BASEDIR}/utils/utils.zsh"
 
 section "misc stuff"
 
-# check_and_open_app /Applications/Karabiner-Elements.app Karabiner-Elements (doesn't work properly)
-check_and_open_app /Applications/Hammerspoon.app Hammerspoon
+# name, grep, path to open
+check_and_open_app Karabiner Karabiner-Menu.app /Applications/Karabiner-Elements.app
+check_and_open_app Hammerspoon Hammerspoon /Applications/Hammerspoon.app
 
 action "Checking default shell"
 local default_shell="/usr/local/bin/zsh"

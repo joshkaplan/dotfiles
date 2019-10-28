@@ -17,8 +17,8 @@ function prompt() {
 }
 
 function check_and_open_app() {
-	action "Checking if $2 is running"
+	action "Checking if $1 is running"
 	if ! run "ps -ef | grep $2 | grep -v grep"; then
-		run "open $1"
+		run "open $3"
 	fi
 }
