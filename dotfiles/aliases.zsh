@@ -23,6 +23,12 @@ file-to-clipboard() {
         -e end \
         "$@"
 }
+alias l1='tree -I node_modules --dirsfirst -ChFL 1'
+alias l2='tree -I node_modules --dirsfirst -ChFL 2'
+alias l3='tree -I node_modules --dirsfirst -ChFL 3'
+alias l4='tree -I node_modules --dirsfirst -ChFL 4'
+alias l5='tree -I node_modules --dirsfirst -ChFL 5'
+alias l6='tree -I node_modules --dirsfirst -ChFL 6'
 
 # Install commands
 function dot() {
@@ -37,6 +43,7 @@ alias gl='git pull --rebase'
 alias glgga='git log --graph --decorate --all --max-count=100'
 alias glo='git log --oneline --decorate --color --max-count=100'
 alias glog='git log --oneline --decorate --color --graph --max-count=100'
+alias glb='git log --graph --oneline --decorate --no-merges --branches --max-count=100'
 alias gpnp="gl && git push"
 alias glanp="gla && git push"
 alias gsla="git stash && gla && git stash pop"
@@ -58,3 +65,9 @@ function pre-commit() {
 	cd -
 }
 alias gpc=pre-commit
+
+# handy function for finding dangling commits, can then recover these with 'git stash apply'
+# credit: https://stackoverflow.com/questions/89332/how-to-recover-a-dropped-stash-in-git
+function git-recover-working() {
+  git log --graph --oneline --decorate $(git fsck --no-reflog | awk '/dangling commit/ {print $3}')
+}
