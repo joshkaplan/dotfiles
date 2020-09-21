@@ -51,6 +51,8 @@ local super = {"cmd", "alt", "ctrl"}
 
 -- HELPERS
 
+-- TODO enable cycling through apps/windows?
+-- TODO enable launching with hold?
 function appToggle(apps)
   return function() 
     for i, v in ipairs(apps) do
@@ -200,24 +202,24 @@ bind(super, "M", function() hs.layout.apply(secondaryLayout) end)
 
 -- APPS
 
-bind(hyper, "Q", appToggle({"Sequel Pro"}))
+bind(hyper, "Q", appToggle({"Sequel Pro", "TablePlus"}))
 bind(hyper, "W", appToggle({"Quip"}))
 bind(hyper, "E", appToggle({"Sublime Text"}))
 -- bind(hyper, "R", appToggle({"Toggl"}))
 bind(hyper, "T", appToggle({"Messages"}))
--- bind(hyper, "Y", appToggle({"FREE"}))
+ bind(hyper, "Y", appToggle({"Amazon Chime"}))
 -- bind(hyper, "O", appToggle({"Todoist"}))
-bind(hyper, "I", appToggle({"PhpStorm", "WebStorm"}))
+bind(hyper, "I", appToggle({"IntelliJ IDEA", "PhpStorm", "WebStorm"}))
 -- bind(hyper, "U", appToggle({"FREE"}))
--- bind(hyper, "P", appToggle({"Lastpass Vault"}))
+ bind(hyper, "P", appToggle({"PyCharm"}))
 
 -- bind(hyper, "A", appToggle({"BeardedSpice Track"}))
 bind(hyper, "S", appToggle({"Spotify"}))
--- bind(hyper, "D", appToggle({"Bartender"}))
-bind(hyper, "F", appToggle({"Finder"}))
-bind(hyper, "G", appToggle({{name = "Fantastical", filename = "Fantastical 2"}, "Calendar"}))
-bind(hyper, "H", appToggle({"Hammerspoon"}))
--- bind(hyper, "J", appToggle({"FREE"}))
+bind(hyper, "D", appToggle({"Google Chrome Beta"}))
+bind(hyper, "F", appToggle({"Firefox"}))
+--bind(hyper, "G", appToggle({{name = "Fantastical", filename = "Fantastical 2"}, "Calendar"}))
+bind(hyper, "H", appToggle({"Finder"}))
+--bind(hyper, "J", appToggle({"FREE"}))
 bind(hyper, "K", appToggle({"Microsoft PowerPoint"}))
 -- bind(hyper, "L", appToggle({"LastPass Search"}))
 -- bind(hyper, ";", appToggle({"iTerm2"}))
@@ -228,10 +230,10 @@ bind(hyper, "C", appToggle({"Slack"}))
 bind(hyper, "V", appToggle({"Evernote"}))
 bind(hyper, "B", appToggle({"Google Chrome"}))
 -- bind(hyper, "N", appToggle({"Todoist Quick Task"}))
-bind(hyper, "M", appToggle({"Mailplane", "Spark", "Microsoft Outlook"}))
+bind(hyper, "M", appToggle({"Mailplane", "Microsoft Outlook"}))
 -- bind(hyper, ",", appToggle({"FREE"}))
--- bind(hyper, ".", appToggle({"FREE"}))
--- bind(hyper, "/", appToggle({"FREE"}))
+-- bind(hyper, ".", appToggle({"FREE"})) (does sys diagnose by default)
+-- bind(hyper, "/", appToggle({"FREE"})) (doesn't seem to work)
 
 -- WINDOWS
 -- todo: layout restoration
@@ -264,6 +266,48 @@ spoon.MiroWindowsManager:bindHotkeys({
 --   fullscreen = {super, "c"}
 -- })
 
+-- APP SHORTCUTS
+function bindAllAppHotkeys()
+  appHotkeys = {}
+  appHotkeys['Todoist'] = {
+    hs.hotkey.new('cmd', '1', todoistGoTo('Home Do')),
+    hs.hotkey.new('cmd', '2', todoistGoTo('Home Plan')),
+    hs.hotkey.new('cmd', '3', todoistGoTo('Work Do')),
+    hs.hotkey.new('cmd', '4', todoistGoTo('Work Plan')),
+  }
+  appHotkeys['Google Chrome'] = {
+  }
+  for appName, hotkeys in pairs(appHotkeys) do
+    filter = hs.window.filter.new(appName)
+    bindAppHotkeys(filter, hotkeys)
+  end
+end
+
+function todoistGoTo(text)
+  return function()
+    hs.eventtap.keyStrokes('/')
+    hs.eventtap.keyStrokes(text)
+    hs.eventtap.event.newKeyEvent({}, "down", true):post()
+    hs.eventtap.event.newKeyEvent({}, "down", false):post()
+    hs.eventtap.event.newKeyEvent({}, "return", true):post()
+    hs.eventtap.event.newKeyEvent({}, "return", false):post()
+  end
+end
+
+function bindAppHotkeys(windowFilter, hotkeys)
+  windowFilter:subscribe(hs.window.filter.windowFocused, function()
+    for i, hotkey in pairs(hotkeys) do
+      hotkey:enable()
+    end
+  end)
+  windowFilter:subscribe(hs.window.filter.windowUnfocused, function()
+    for i, hotkey in pairs(hotkeys) do
+      hotkey:disable()
+    end
+  end)
+end
+bindAllAppHotkeys()
+
 -- nudge wdith
 bind(super, "=", changeWidth(50), nil, changeWidth(50))
 bind(super, "-", changeWidth(-50), nil, changeWidth(-50))
@@ -283,6 +327,22 @@ bind({"cmd", "ctrl", "shift"}, "Up", function() for i,win in ipairs(hs.window.al
 bind({"cmd", "ctrl", "shift"}, "Up", function() for i,win in ipairs(hs.window.allWindows()) do win:moveOneScreenSouth() end end)
 bind({"cmd", "ctrl", "shift"}, "Up", function() for i,win in ipairs(hs.window.allWindows()) do win:moveOneScreenWest() end end)
 bind({"cmd", "ctrl", "shift"}, "Up", function() for i,win in ipairs(hs.window.allWindows()) do win:moveOneScreenEast() end end)
+
+-- SWITCHER
+-- set up your windowfilter
+switcher = hs.window.switcher.new(hs.window.filter.new():setDefaultFilter{})
+switcher_vis = hs.window.switcher.new() -- default windowfilter: only visible windows, all Spaces
+switcher_space = hs.window.switcher.new(hs.window.filter.new():setCurrentSpace(true):setDefaultFilter{}) -- include minimized/hidden windows, current Space only
+switcher_browsers = hs.window.switcher.new{'Safari','Google Chrome', 'Google Chrome Beta', 'Firefox'} -- specialized switcher for your dozens of browser windows :)
+
+-- bind to hotkeys; WARNING: at least one modifier key is required!
+bind('alt','tab',nil,function()switcher_browsers:next()end)
+bind('alt-shift','tab',nil,function()switcher_browsers:previous()end)
+
+-- alternatively, call .nextWindow() or .previousWindow() directly (same as hs.window.switcher.new():next())
+-- hs.hotkey.bind('alt','tab','Next window',hs.window.switcher.nextWindow)
+-- you can also bind to `repeatFn` for faster traversing
+-- hs.hotkey.bind('alt-shift','tab','Prev window',hs.window.switcher.previousWindow,nil,hs.window.switcher.previousWindow)
 
 log('Initialized')
 hs.alert.show("Hammerspoon Loaded")
