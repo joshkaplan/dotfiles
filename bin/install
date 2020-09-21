@@ -5,7 +5,6 @@ BASEDIR="$(cd $CURRENT_DIR/.. && pwd)"
 PRIVATE_BASEDIR="${BASEDIR}-private"
 source "${BASEDIR}/utils/output.zsh"
 source "${BASEDIR}/utils/utils.zsh"
-source "${BASEDIR}/utils/pkg_utils.zsh"
 
 # SETUP
 ##############################
@@ -21,21 +20,14 @@ if [[ -d $TARGET_DIR && -x $TARGET_DIR/bin/install && $TARGET_DIR:l != $BASEDIR:
 	fi
 fi
 
-if ! which brew > /dev/null; then
-  action "Installing brew \U1F37A"
-  if ! run "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""; then
-    error "unable to install brew, script $0 abort!"
-    exit 1
-  fi
-fi
-
 # PACKAGES
 ##############################
 
 section "syncing packages"
 
-$BASEDIR/bin/pkg -t brew -I -u -F -f "${BASEDIR}/packages/Brewfile"
-$BASEDIR/bin/pkg -t pip  -I -u -F -f "${BASEDIR}/packages/pip_packages.txt"
+$BASEDIR/bin/pkg -t brew -i -I -u -F -f "${BASEDIR}/packages/Brewfile"
+$BASEDIR/bin/pkg -t pip  -i -I -u -F -f "${BASEDIR}/packages/pip_packages.txt"
+$BASEDIR/bin/pkg -t ohmyzsh -u -i -F
 
 end_section "syncing packages"
 

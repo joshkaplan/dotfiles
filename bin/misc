@@ -24,12 +24,6 @@ if [ $SHELL != $default_shell ]; then
 	run "chsh -s $default_shell"
 fi
 
-# Oh My ZSH
-if [[ ! -d ~/.oh-my-zsh ]]; then
-  action "Cloning oh-my-zsh"
-  run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
-fi
-
 # SSH
 # https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 # https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account

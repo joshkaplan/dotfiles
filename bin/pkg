@@ -13,11 +13,11 @@ DEFAULT_FILES[brew]="${BASEDIR}/packages/Brewfile"
 
 # Process args
 ORIG_ARGS=$*
-zparseopts -D -E -- f:=FILE t:=PKG_TYPE F=FAST_MODE U=UPGRADE_MODE u=UPDATE_MODE I=INSTALL_MODE S=SAVE_MODE h=HELP_MODE d=DEBUG_MODE
+zparseopts -D -E -- f:=FILE t:=PKG_TYPE F=FAST_MODE U=UPGRADE_MODE u=UPDATE_MODE i=INSTALL_MODE I=INSTALL_PKG_MODE S=SAVE_MODE h=HELP_MODE d=DEBUG_MODE D=DIFF_MODE
 if [[ $HELP_MODE ]]; then 
 #	echo "By default, updates packaage managers and checks pacakge diffs"
 	echo "\nUsage:"
-	echo "    pkg_sync [-t type] [-f file] [options]"
+	echo "    pkg [-t type] [-f file] [options]"
 	echo "\nOptions:"
 	echo "    -h  show this help"
 	echo "    -t  type (brew, pip, defaults to all)"
@@ -25,10 +25,12 @@ if [[ $HELP_MODE ]]; then
 	echo "    -F  fast/force mode (skips prompts)"
 	echo "\nActions:"
 	echo "(Runs all if none are specified. If multiple run, will run in this order.)"
-	echo "    -u  update package managers"
+	echo "    -i  install"
+	echo "    -u  update"
 	echo "    -I  install packages from file"
 	echo "    -U  upgrade local packages"
 	echo "    -S  save local packages to file"
+	echo "    -D  view diff of local packages vs file"
 	return 0
 fi
 
@@ -39,9 +41,9 @@ fi
 
 # if type not set, run for all
 if [[ -z $PKG_TYPE ]]; then
-  $BASEDIR/bin/pkg -t ohmyzsh $ORIG_ARGS
   $BASEDIR/bin/pkg -t brew $ORIG_ARGS
   $BASEDIR/bin/pkg -t pip  $ORIG_ARGS
+  $BASEDIR/bin/pkg -t ohmyzsh $ORIG_ARGS
   exit 0
 fi
 
@@ -53,41 +55,51 @@ fi
 FILENAME="${FILE##*/}"
 
 # if no mode set, set defaults
-if [[ ! $UPDATE_MODE && ! $INSTALL_MODE && ! $UPGRADE_MODE && ! $SAVE_MODE ]]; then
-  if [[ $PKG_TYPE -eq 'ohmyzsh' ]]; then
+if [[ ! $UPDATE_MODE && ! $INSTALL_PKG_MODE && ! $UPGRADE_MODE && ! $SAVE_MODE && ! $DIFF_MODE && ! $INSTALL_MODE ]]; then
+  if [[ $PKG_TYPE == 'ohmyzsh' ]]; then
     UPDATE_MODE=1
   else
     UPDATE_MODE=1
-    INSTALL_MODE=1
+    INSTALL_PKG_MODE=1
     UPGRADE_MODE=1
     SAVE_MODE=1
   fi
 fi
 
 if [[ $DEBUG_MODE ]]; then
-  echo "PKG_TYPE:     $PKG_TYPE"
-  echo "FILE:         $FILE"
-  echo "FILENAME:     $FILENAME"
-  echo "FAST_MODE     $FAST_MODE"
-  echo "UPGRADE_MDE:  $UPGRADE_MODE"
-  echo "UPDATE_MOE:   $UPDATE_MODE"
-  echo "INSTALL_MDE:  $INSTALL_MODE"
-  echo "SAVE_MODE     $SAVE_MODE"
-  echo "HELP_MODE     $HELP_MODE"
-  echo "DEBUG_MOD:    $DEBUG_MODE"
+  echo "PKG_TYPE:         $PKG_TYPE"
+  echo "FILE:             $FILE"
+  echo "FILENAME:         $FILENAME"
+  echo "FAST_MODE         $FAST_MODE"
+  echo "UPGRADE_MODE:     $UPGRADE_MODE"
+  echo "UPDATE_MODE:      $UPDATE_MODE"
+  echo "INSTALL_PKG_MODE: $INSTALL_PKG_MODE"
+  echo "SAVE_MODE         $SAVE_MODE"
+  echo "HELP_MODE         $HELP_MODE"
+  echo "DEBUG_MOD:        $DEBUG_MODE"
   exit 0
 fi
 
-# Update package manager
+# View the diff
+if [[ $DIFF_MODE ]]; then
+  pkg_diff $PKG_TYPE $FILE
+fi
+
+# Install
+if [[ $INSTALL_MODE ]]; then
+  check_and_install $PKG_TYPE
+fi
+
+# Update
 if [[ $UPDATE_MODE ]]; then
   if [[ $FAST_MODE ]] || yes_no "Would you like to update ${PKG_TYPE} (recommended)?"; then
-    pkg_update $PKG_TYPE
+    _update $PKG_TYPE
   fi
 fi
 
 # Install packages from file
-if [[ $INSTALL_MODE ]]; then
-  pkg_check_diff_and_do "pkg_install $PKG_TYPE $FILE" "Would you like to install ${PKG_TYPE} packages (right)?"
+if [[ $INSTALL_PKG_MODE ]]; then
+  pkg_check_diff_and_do "pkg_install $PKG_TYPE $FILE" "Would you like to install ${PKG_TYPE} packages (right)?" $FAST_MODE
 fi
 
 # Upgrade local packages
@@ -104,5 +116,5 @@ fi
 
 # Save to file
 if [[ $SAVE_MODE ]]; then
-  pkg_check_diff_and_do "pkg_save $PKG_TYPE $FILE" "Would you like to save local ${PKG_TYPE} packages (left) to ${FILENAME} (right)?"
+  pkg_check_diff_and_do "pkg_save $PKG_TYPE $FILE" "Would you like to save local ${PKG_TYPE} packages (left) to ${FILENAME} (right)?" $FAST_MODE
 fi

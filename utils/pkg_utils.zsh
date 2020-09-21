@@ -92,7 +92,8 @@ function pkg_outdated() {
 	esac
 }
 
-function pkg_update() {
+# misc updates (not using a package manager)
+function _update() {
   local TYPE=$1
   action "Updating ${TYPE} ${EMOJI[${TYPE}]}"
 	case "$1" in
@@ -103,15 +104,46 @@ function pkg_update() {
 			run "pip3 install pip --upgrade"
 			;;
 	  ohmyzsh)
-      run "env ZSH=$ZSH sh $ZSH/tools/upgrade.sh"
+      # upgrade_oh_my_zsh
+      run "sh ~/.oh-my-zsh/tools/upgrade.sh"
       ;;
 		*)
-			error "unknown package manager $1"
+			error "don't know how to install $1"
+			return 1
+	esac
+}
+
+# misc installs (not using a package manager)
+function check_and_install() {
+  local TYPE=$1
+  local ACTION_CMD="action \"Installing ${TYPE} ${EMOJI[${TYPE}]}\""
+	case "$1" in
+		brew)
+      if ! which brew > /dev/null; then
+        eval $ACTION_CMD
+        run "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""
+      fi
+			;;
+		pip)
+		  if ! which pip3 > /dev/null; then
+        error "pip should be installed with brew"
+        return 1
+		  fi
+			;;
+	  ohmyzsh)
+      if [[ ! -d ~/.oh-my-zsh ]]; then
+        eval $ACTION_CMD
+        run "git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
+      fi
+      ;;
+		*)
+			error "don't know how to update $1"
 			return 1
 	esac
 }
 
 function pkg_check_diff_and_do() {
+  local FAST_MODE=$3;
   if [[ $FAST_MODE ]]; then
     eval $1
   else
