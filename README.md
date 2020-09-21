@@ -47,3 +47,4 @@ dot pkg     # CLI tool for advanced/dynamic package management; run with -h for 
 * [Dropbox](https://db.tt/x739XBiN)
 * [KarabinerElements](https://github.com/tekezo/Karabiner-Elements)
 * [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)
+* [Todoist](https://todoist.com/r/jkap901_vpzbpm)
