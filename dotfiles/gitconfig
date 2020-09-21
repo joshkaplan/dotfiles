@@ -13,5 +13,8 @@
 [core]
 	autocrlf = input # Windows / OSX filesystems don't get along without this.
 	excludesfile = ~/.gitignore_global
+	pager = less -FMRiX
 [include]
 	path = ~/.gitconfig_local
+[alias]
+	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)%an <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
