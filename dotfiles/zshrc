@@ -13,6 +13,7 @@ export VISUAL=vim
 ZSH_THEME="agnoster"
 DEFAULT_USER="josh"
 ENABLE_CORRECTION="true" # Auto Correct
+VIRTUAL_ENV_DISABLE_PROMPT="true"
 
 # LIBRARIES 
 ##############################
@@ -20,6 +21,42 @@ ENABLE_CORRECTION="true" # Auto Correct
 # oh-my-zsh
 plugins=(git sublime osx)
 source $ZSH/oh-my-zsh.sh
+
+# theme overrides (maybe switch this at some point)
+prompt_virtualenv() {
+  local virtualenv_path="$VIRTUAL_ENV"
+  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
+    prompt_segment cyan black "`basename $virtualenv_path`"
+  fi
+}
+prompt_aws() {
+  [[ -z "$AWS_PROFILE" ]] && return
+  if [[ -n "$AWS_DEFAULT_REGION" ]]; then
+  	local region=" (${AWS_DEFAULT_REGION})"
+  fi
+  case "$AWS_PROFILE" in
+    *-prod|*production*)
+    	prompt_segment red yellow "${AWS_PROFILE}${region}"
+    	;;
+    *)
+    	prompt_segment white black "${AWS_PROFILE}${region}"
+    	;;
+#     *) prompt_segment white black "$AWS_PROFILE ($AWS_DEFAULT_REGION)" && prompt_segment black white "$AWS_DEFAULT_REGION" ;;
+  esac
+}
+build_prompt() {
+  RETVAL=$?
+  prompt_status
+  prompt_virtualenv
+  prompt_aws
+  prompt_context
+  prompt_dir
+  prompt_git
+  prompt_bzr
+  prompt_hg
+  prompt_end
+}
+PROMPT='%{%f%b%k%}$(build_prompt) '
 
 # Shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -30,6 +67,15 @@ eval "$(rbenv init -)"
 # Github
 eval "$(hub alias -s)"
 
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# virtualenv
+export WORKON_HOME=~/graphiq/venvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+[ -f /usr/local/bin/virtualenvwrapper.sh ] && source /usr/local/bin/virtualenvwrapper.sh
 
 # SETTINGS
 ##############################
@@ -50,6 +96,10 @@ HELPDIR=/usr/local/share/zsh/help
 zmodload zsh/complist
 bindkey -M menuselect ' ' accept-and-infer-next-history
 bindkey -M menuselect '^?' undo
+
+# More completions
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
 
 # SOURCE MORE STUFF
 ##############################
