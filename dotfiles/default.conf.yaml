@@ -5,6 +5,10 @@
 
 - clean: ['~']
 
+- clean: 
+    ~/.oh-my-zsh/custom':
+        recursive: true
+
 - link:
     ~/.dotfiles: '..'
     ~/.zshrc: zshrc
@@ -17,12 +21,16 @@
       path: config/*
     ~/.hammerspoon: hammerspoon
     ~/.ssh/config: ssh/config
-    # re-enable if want to customize oh-my-zsh
-    #~/.oh-my-zsh/custom/themes/: 
-    #  glob: true
-    #  path: oh-my-zsh/themes/*
-    #  relink: true
-    #~/.oh-my-zsh/custom/plugins/: 
+    # customize oh-my-zsh themes
+    ~/.oh-my-zsh/custom/themes/powerlevel10k.zsh-theme: /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+    ~/.p10k.zsh: p10k.zsh
+    # customize oh-my-zsh themes
+    # ~/.oh-my-zsh/custom/themes/: 
+    #   glob: true
+    #   path: oh-my-zsh/themes/*.zsh-theme
+    #   relink: true
+    # customize oh-my-zsh plugins
+    # ~/.oh-my-zsh/custom/plugins/: 
     #  glob: true
     #  path: oh-my-zsh/plugins/*
     #  relink: true
