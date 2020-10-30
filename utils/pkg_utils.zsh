@@ -121,7 +121,7 @@ function check_and_install() {
 		brew)
       if ! which brew > /dev/null; then
         eval $ACTION_CMD
-        run "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""
+        run "/bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\""
       fi
 			;;
 		pip)
