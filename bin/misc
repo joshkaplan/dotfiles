@@ -14,7 +14,7 @@ check_and_open_app Hammerspoon Hammerspoon /Applications/Hammerspoon.app
 
 # Default Shell
 action "Checking default shell"
-local default_shell="/usr/local/bin/zsh"
+default_shell="$(brew --prefix zsh)/bin/zsh"
 if ! run "grep -Fx \"$default_shell\" /etc/shells"; then
 	action "Adding $default_shell to /etc/shells (requires sudo)"
 	run "sudo sh -c \"echo $default_shell >> /etc/shells\""

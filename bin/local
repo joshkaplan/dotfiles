@@ -8,13 +8,14 @@ source "${BASEDIR}/utils/output.zsh"
 section "executing local scripts"
 
 # Search for ./install_local
-local LOCAL_INSTALL="${BASEDIR}/bin/install_local"
+LOCAL_INSTALL="${BASEDIR}/bin/install_local"
 if [[ -f $LOCAL_INSTALL ]]; then
-  # run it
+	# run it
 	eval "$LOCAL_INSTALL $*"
 
 	# ensure dropbox is not syncing it
-  run "xattr -sw com.dropbox.ignored 1 ${BASEDIR}/bin/install_local"
+	# TODO reimplement local stuff as it's own unsynced folder
+	run "xattr -sw com.dropbox.ignored 1 ${BASEDIR}/bin/install_local"
 else
 	warn "can't find ./install_local"
 	action "Searching for install files (you will need to run/link these manually):"

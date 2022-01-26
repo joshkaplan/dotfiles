@@ -8,21 +8,14 @@ alias ohmyzsh='~/.oh-my-zsh'
 
 # Misc. Commands
 alias zshconfig='vim ~/.zshrc && source ~/.zshrc'
-alias del='rmtrash'
-alias dj="python manage.py"
-alias mp="open -a /Applications/Mailplane\ 3.app"
-function ls () { /bin/ls $* | grep -v 'Icon\?\|.DS_Store' }
+alias zshreload='source ~/.zshrc'
+# temp fix, commit this in a clean way (i.e. actually remove rmtrash)
+#alias del='rmtrash'
+alias rmtrash='trash'
+
+# ls
 alias l='ls -lAh'
 alias la='ls -lah'
-alias reload='exec -l /usr/local/bin/zsh'
-alias notif='terminal-notifier -message'
-file-to-clipboard() {
-    osascript \
-        -e 'on run args' \
-        -e 'set the clipboard to POSIX file (first item of args)' \
-        -e end \
-        "$@"
-}
 alias l1='tree -I node_modules --dirsfirst -ChFL 1'
 alias l2='tree -I node_modules --dirsfirst -ChFL 2'
 alias l3='tree -I node_modules --dirsfirst -ChFL 3'
@@ -71,3 +64,7 @@ alias gpc=pre-commit
 function git-recover-working() {
   git log --graph --oneline --decorate $(git fsck --no-reflog | awk '/dangling commit/ {print $3}')
 }
+
+# x86 aliases
+alias xbrew="/usr/local/bin/brew"
+alias xpython="/usr/local/bin/python3"

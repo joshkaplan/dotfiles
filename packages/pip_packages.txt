@@ -1,5 +1,4 @@
-dotbot==1.16.0
-PyYAML==3.13
-virtualenv==20.0.31
-virtualenvwrapper==4.8.4
-xkcdpass==1.17.3
+dotbot
+virtualenv
+virtualenvwrapper
+xkcdpass

@@ -22,8 +22,9 @@
     ~/.hammerspoon: hammerspoon
     ~/.ssh/config: ssh/config
     # customize oh-my-zsh themes
-    ~/.oh-my-zsh/custom/themes/powerlevel10k.zsh-theme: /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+    ~/.oh-my-zsh/custom/themes/powerlevel10k.zsh-theme: /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
     ~/.p10k.zsh: p10k.zsh
+    ~/.tool-versions: tool-versions
     # customize oh-my-zsh themes
     # ~/.oh-my-zsh/custom/themes/: 
     #   glob: true

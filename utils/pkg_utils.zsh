@@ -137,7 +137,7 @@ function check_and_install() {
       fi
       ;;
 		*)
-			error "don't know how to update $1"
+			error "don't know how to install $1"
 			return 1
 	esac
 }
