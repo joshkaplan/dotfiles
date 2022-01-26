@@ -3,6 +3,8 @@
 	email = joshkaplan@users.noreply.github.com
 [credential]
 	helper = osxkeychain
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager-core
 [color]
 	ui = true
 [filter "media"]
@@ -18,3 +20,7 @@
 	path = ~/.gitconfig_local
 [alias]
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)%an <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+[init]
+	defaultBranch = main
+[credential "https://dev.azure.com"]
+	useHttpPath = true
