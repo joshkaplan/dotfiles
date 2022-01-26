@@ -40,6 +40,8 @@ dot pkg     # CLI tool for advanced/dynamic package management; run with -h for 
 #### Links
 
 * [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)
+* [powerlevel10k](https://github.com/romkatv/powerlevel10k)
+* [nerd fonts](https://github.com/ryanoasis/nerd-fonts)
 * [dotbot](https://github.com/anishathalye/dotbot/)
 * [atomantic/dotfiles](https://github.com/atomantic/dotfiles)
 * [homebrew](https://brew.sh/)
