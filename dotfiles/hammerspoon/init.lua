@@ -3,8 +3,7 @@ spoon.ReloadConfiguration:start()
 
 -- LOAD / REQUIRE
 hs.loadSpoon("MiroWindowsManager")
-require("hs.ipc")
-hs.ipc.cliInstall()
+--hs.loadSpoon("CustomSwitcher")
 
 -- SETTINGS
 -- solarized console
@@ -40,8 +39,8 @@ local reload = hs.reload
 local pbcopy = hs.pasteboard.setContents
 local std = hs.stdlib and require("hs.stdlib")
 
-local laptopScreen = "Color LCD"
-local bigScreen = "LED Cinema Display"
+local laptopScreen = "Built-in Retina Display"
+local bigScreen = "34CHR"
 
 local loger = hs.logger.new('[LOG]','debug')
 local log = loger.i
@@ -59,17 +58,15 @@ function appToggle(apps)
       local app, filename
       if type(v) == 'table' then
         app = hs.application.get(v.name)
-        filename = v.filename
       else
         app = hs.application.get(v)
-        filename = v
       end
       if app then
-        if app:isFrontmost() then
+        local bundleID = app:bundleID()
+        if fw() and fw():application():bundleID() == bundleID then
           app:hide()
         else
           app:activate()
-          -- hs.application.launchOrFocus(filename)
         end
       end
     end
@@ -77,9 +74,10 @@ function appToggle(apps)
   end
 end
 
+
 function changeWidth(amt)
-  return function() 
-    local s = fw():size() 
+  return function()
+    local s = fw():size()
     s.w = s.w + amt
     fw():setSize(s)
   end
@@ -176,8 +174,8 @@ function table_print (tt, indent, done)
         table.insert(sb, string.format("\"%s\"\n", tostring(value)))
       else
         table.insert(sb, string.format(
-            "%s = \"%s\"\n", tostring (key), tostring(value)))
-       end
+          "%s = \"%s\"\n", tostring (key), tostring(value)))
+      end
     end
     return table.concat(sb)
   else
