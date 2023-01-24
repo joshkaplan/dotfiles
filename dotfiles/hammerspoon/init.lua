@@ -183,52 +183,73 @@ function table_print (tt, indent, done)
   end
 end
 function to_string( tbl )
-    if  "nil"       == type( tbl ) then
-        return tostring(nil)
-    elseif  "table" == type( tbl ) then
-        return table_print(tbl)
-    elseif  "string" == type( tbl ) then
-        return tbl
-    else
-        return tostring(tbl)
-    end
+  if  "nil"       == type( tbl ) then
+    return tostring(nil)
+  elseif  "table" == type( tbl ) then
+    return table_print(tbl)
+  elseif  "string" == type( tbl ) then
+    return tbl
+  else
+    return tostring(tbl)
+  end
 end
+
+-- https://stackoverflow.com/questions/2705793/how-to-get-number-of-entries-in-a-lua-table
+function table_length(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
 
 bind(super, "R", restoreLayout)
 bind(super, "S", saveLayout)
-bind(super, "M", function() hs.layout.apply(secondaryLayout) end)
+
+bind(super, "P", function()
+  hs.layout.apply(secondaryLayout2)
+  hs.window.get('Pomotroid'):centerOnScreen()
+end)
 
 -- APPS
 
 bind(hyper, "Q", appToggle({"Sequel Pro", "TablePlus"}))
-bind(hyper, "W", appToggle({"Quip"}))
+bind({}, "f17", appToggle({"Quip", "Microsoft Word"})) -- write; hyper "W" remapped to override system shortcut
 bind(hyper, "E", appToggle({"Sublime Text"}))
 -- bind(hyper, "R", appToggle({"Toggl"}))
 bind(hyper, "T", appToggle({"Messages"}))
- bind(hyper, "Y", appToggle({"Amazon Chime"}))
--- bind(hyper, "O", appToggle({"Todoist"}))
-bind(hyper, "I", appToggle({"IntelliJ IDEA", "PhpStorm", "WebStorm"}))
+bind(hyper, "Y", appToggle({"Pomotroid"}))
+--bind(hyper, "O", appToggle({"Todoist"}))
+bind(hyper, "I", appToggle({
+	-- IDEs
+	"IntelliJ IDEA",
+	"IntelliJ IDEA-EAP",
+	"PhpStorm",
+	"WebStorm",
+	"RStudio",
+	"PyCharm",
+	"Code"
+}))
 -- bind(hyper, "U", appToggle({"FREE"}))
- bind(hyper, "P", appToggle({"PyCharm"}))
+--bind(hyper, "P", appToggle({"1Password"}))
 
--- bind(hyper, "A", appToggle({"BeardedSpice Track"}))
+bind(hyper, "A", appToggle({"Sketch"}))
 bind(hyper, "S", appToggle({"Spotify"}))
-bind(hyper, "D", appToggle({"Google Chrome Beta"}))
-bind(hyper, "F", appToggle({"Firefox"}))
---bind(hyper, "G", appToggle({{name = "Fantastical", filename = "Fantastical 2"}, "Calendar"}))
-bind(hyper, "H", appToggle({"Finder"}))
+-- bind(hyper, "D", appToggle({"Bartender / Dozer"}))
+bind(hyper, "F", appToggle({"Finder"}))
+bind(hyper, "G", appToggle({{name = "Fantastical", filename = "Fantastical 2"}, "Calendar"}))
+--bind(hyper, "H", appToggle({"FREE"})) --TODO make this 'home browser' vs work browser?
 --bind(hyper, "J", appToggle({"FREE"}))
-bind(hyper, "K", appToggle({"Microsoft PowerPoint"}))
--- bind(hyper, "L", appToggle({"LastPass Search"}))
+--bind(hyper, "K", appToggle({"FREE"}))
+-- bind(hyper, "L", appToggle({"FREE"}))
 -- bind(hyper, ";", appToggle({"iTerm2"}))
 
--- bind(hyper, "Z", appToggle({"FREE"}))
+bind(hyper, "Z", appToggle({"zoom.us", "Amazon Chime"})) -- zoom / video
 bind(hyper, "X", appToggle({"Microsoft Excel"}))
-bind(hyper, "C", appToggle({"Slack"}))
-bind(hyper, "V", appToggle({"Evernote"}))
+bind(hyper, "C", appToggle({"Slack", "Discord", "Yogi Slack"}))
+bind(hyper, "V", appToggle({"Evernote", "Evernote Legacy"}))
 bind(hyper, "B", appToggle({"Google Chrome"}))
 -- bind(hyper, "N", appToggle({"Todoist Quick Task"}))
-bind(hyper, "M", appToggle({"Mailplane", "Microsoft Outlook"}))
+bind(hyper, "M", appToggle({"Mailplane", "Microsoft Outlook", "Gmail", "Yogi Gmail"}))
 -- bind(hyper, ",", appToggle({"FREE"}))
 -- bind(hyper, ".", appToggle({"FREE"})) (does sys diagnose by default)
 -- bind(hyper, "/", appToggle({"FREE"})) (doesn't seem to work)
