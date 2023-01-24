@@ -1,5 +1,6 @@
 [user]
-	name = joshkaplan
+	# note: if using github web operations, don't override this (for consistency)
+	name = Josh Kaplan
 	email = joshkaplan@users.noreply.github.com
 [credential]
 	helper = /usr/local/share/gcm-core/git-credential-manager-core

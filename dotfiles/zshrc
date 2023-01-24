@@ -73,7 +73,9 @@ eval "$(pyenv init -)"
 # Vim Keybindings
 bindkey -v
 
-# Separate Histories
+# Separate Histories (must be unset after loading oh-my-zsh)
+# iTerm keeps a combined history anyway, and this enables up/down arrow to be session-specific
+# TODO it might be nice to improve new session / restore session behavior
 unsetopt inc_append_history
 unsetopt share_history
 

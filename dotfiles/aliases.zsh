@@ -47,17 +47,42 @@ ghc() {
 	git browse -- commit/$*
 }
 alias ghcr="ghc \`grp HEAD\`"
-alias gh="git browse"
+#alias gh="git browse"
 alias gph="git push && ghcr"
 alias glanph="glanp && ghcr"
 alias gsu="git submodule update --init --recursive"
 alias gsth="git stash"
-function pre-commit() {
+function run-pre-commit() {
 	cd "`git rev-parse --show-toplevel`"
 	./.git/hooks/pre-commit
 	cd -
 }
-alias gpc=pre-commit
+alias gpc=run-pre-commit
+
+# gla branch
+glab() {
+  local branch_to_update=$1
+  if [[ -z $branch_to_update ]]; then
+    echo "No branch given"
+    return 1
+  fi
+
+  shift
+  local branch_to_checkout=$*
+
+  if [[ -z $branch_to_checkout ]]; then
+    branch_to_checkout="-"
+  fi
+
+  gco "$branch_to_update"
+  gla
+  gco "$branch_to_checkout"
+}
+gslab() {
+  gsth && glab "$*" && gstp
+}
+
+alias bncdeploy="gco production && git rebase main && git push && gco -"
 
 # handy function for finding dangling commits, can then recover these with 'git stash apply'
 # credit: https://stackoverflow.com/questions/89332/how-to-recover-a-dropped-stash-in-git
