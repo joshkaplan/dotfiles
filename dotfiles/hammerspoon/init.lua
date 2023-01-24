@@ -262,6 +262,11 @@ bind(hyper, "M", appToggle({"Mailplane", "Microsoft Outlook", "Gmail", "Yogi Gma
 bind(super, "space", showGrid)
 bind(hyper, "space", showGrid)
 
+-- screenshots
+bind({"cmd", "shift"}, "3", function() hs.execute("source ~/.dotfiles/utils/screenshot.zsh; screenshot", true) end)
+bind({"cmd", "shift"}, "4", function() hs.execute("source ~/.dotfiles/utils/screenshot.zsh; screenshot_i", true) end)
+bind({"cmd", "shift"}, "5", function() hs.execute("source ~/.dotfiles/utils/screenshot.zsh; screenshot_ui", true) end)
+
 -- window movement
 spoon.MiroWindowsManager:bindHotkeys({
   up = {super, "up"},
@@ -270,29 +275,52 @@ spoon.MiroWindowsManager:bindHotkeys({
   left = {super, "left"},
   fullscreen = {super, "return"}
 })
--- spoon.MiroWindowsManager:bindHotkeys({
---   up = {super, "up"},
---   right = {super, "right"},
---   down = {super, "down"},
---   left = {super, "left"},
---   fullscreen = {super, "m"}
--- })
--- spoon.MiroWindowsManager:bindHotkeys({
---   up = {super, "up"},
---   right = {super, "right"},
---   down = {super, "down"},
---   left = {super, "left"},
---   fullscreen = {super, "c"}
--- })
+-- various center stuff
+bind(super, "m", function()
+  local f = fw():frame()
+  local sf = fw():screen():frame()
+  --local w = math.min(sf.w * 2 / 3, 1400)
+  local w = sf.w * 2 / 3
+  f.w = w
+  f.h = sf.h
+  f.x = sf.x + ((sf.w - f.w) / 2)
+  f.y = sf.y
+  fw():setFrame(f)
+end)
+bind(super, "n", function()
+  local f = fw():frame()
+  local sf = fw():screen():frame()
+  --local w = math.min(sf.w * 2 / 3, 1400)
+  local w = sf.w * 1 / 2
+  f.w = w
+  f.h = sf.h
+  f.x = sf.x + ((sf.w - f.w) / 2)
+  f.y = sf.y
+  fw():setFrame(f)
+end)
+bind(super, "b", function()
+  local f = fw():frame()
+  local sf = fw():screen():frame()
+  --local w = math.min(sf.w * 2 / 3, 1400)
+  local w = sf.w * 1 / 3
+  f.w = w
+  f.h = sf.h
+  f.x = sf.x + ((sf.w - f.w) / 2)
+  f.y = sf.y
+  fw():setFrame(f)
+end)
 
 -- APP SHORTCUTS
+-- TODO: use modals for todoist to cycle through
 function bindAllAppHotkeys()
   appHotkeys = {}
   appHotkeys['Todoist'] = {
-    hs.hotkey.new('cmd', '1', todoistGoTo('Home Do')),
-    hs.hotkey.new('cmd', '2', todoistGoTo('Home Plan')),
-    hs.hotkey.new('cmd', '3', todoistGoTo('Work Do')),
-    hs.hotkey.new('cmd', '4', todoistGoTo('Work Plan')),
+    hs.hotkey.new('cmd', '1', todoistGoTo('Personal Do')),
+    hs.hotkey.new('cmd', '2', todoistGoTo('Personal Plan Tomorrow')),
+    hs.hotkey.new('cmd', '3', todoistGoTo('Personal Plan Week')),
+    hs.hotkey.new('cmd', '4', todoistGoTo('Work Do')),
+    hs.hotkey.new('cmd', '5', todoistGoTo('Work Plan Tomorrow')),
+    hs.hotkey.new('cmd', '6', todoistGoTo('Work Plan Week')),
   }
   appHotkeys['Google Chrome'] = {
   }
@@ -306,13 +334,28 @@ function todoistGoTo(text)
   return function()
     hs.eventtap.keyStrokes('/')
     hs.eventtap.keyStrokes(text)
-    hs.eventtap.event.newKeyEvent({}, "down", true):post()
-    hs.eventtap.event.newKeyEvent({}, "down", false):post()
-    hs.eventtap.event.newKeyEvent({}, "return", true):post()
-    hs.eventtap.event.newKeyEvent({}, "return", false):post()
+    hs.timer.doAfter(.2, function()
+      hs.eventtap.event.newKeyEvent({}, "down", true):post()
+      hs.eventtap.event.newKeyEvent({}, "down", false):post()
+      hs.eventtap.event.newKeyEvent({}, "return", true):post()
+      hs.eventtap.event.newKeyEvent({}, "return", false):post()
+    end)
   end
 end
 
+
+function chromeOpenWindow(name)
+  return function()
+    local app = hs.application.find("Google Chrome")
+    app:selectMenuItem({"Window", name})
+  end
+end
+
+bind(super, '1', chromeOpenWindow('Personal'))
+bind(super, '3', chromeOpenWindow('Symphony'))
+bind(super, '5', chromeOpenWindow('Yogi'))
+
+-- TODO this doesn't seem to fire on a hide and then show (another app has to be explicitly focused)
 function bindAppHotkeys(windowFilter, hotkeys)
   windowFilter:subscribe(hs.window.filter.windowFocused, function()
     for i, hotkey in pairs(hotkeys) do
